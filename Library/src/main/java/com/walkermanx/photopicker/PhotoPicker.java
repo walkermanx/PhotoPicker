@@ -14,6 +14,11 @@ import java.util.ArrayList;
 
 import com.walkermanx.photopicker.utils.PermissionsUtils;
 
+import static com.walkermanx.Constants.EXTRA_STATUSBARCOLOR;
+import static com.walkermanx.Constants.EXTRA_TITLE_MARGIN_START;
+import static com.walkermanx.Constants.EXTRA_TOOLBARCOLOR;
+import static com.walkermanx.Constants.EXTRA_TOOLBAR_WIDGET_COLOR;
+
 /**
  * Created by Donglua on 16/6/25.
  * Builder class to ease Intent setup.
@@ -39,12 +44,8 @@ public class PhotoPicker {
     public final static String EXTRA_SHOW_CAMERA = "SHOW_CAMERA";
     public final static String EXTRA_OPEN_CAMERA = "OPEN_CAMERA";
     public final static String EXTRA_OPEN_CROP = "OPEN_CROP";
-    public final static String EXTRA_TITLE_MARGIN_START = "TITLE_MARGIN_START";
     public final static String EXTRA_CROP_X = "CROP_X";
     public final static String EXTRA_CROP_Y = "CROP_Y";
-    public final static String EXTRA_CROP_TOOLBARCOLOR = "TOOLBAR_COLORS";
-    public final static String EXTRA_CROP_TOOLBAR_WIDGET_COLOR = "TOOLBAR_WIDGET_COLORS";
-    public final static String EXTRA_CROP_STATUSBARCOLOR = "STATUSBAR_COLORS";
 
     public final static String EXTRA_SHOW_GIF = "SHOW_GIF";
     public final static String EXTRA_GRID_COLUMN = "column";
@@ -173,14 +174,10 @@ public class PhotoPicker {
             return this;
         }
 
-        public PhotoPickerBuilder setCropColors(@ColorRes int toolbarColor, @ColorRes int statusBarColor) {
-            mPickerOptionsBundle.putInt(EXTRA_CROP_TOOLBARCOLOR, toolbarColor);
-            mPickerOptionsBundle.putInt(EXTRA_CROP_STATUSBARCOLOR, statusBarColor);
-            return this;
-        }
-
-        public PhotoPickerBuilder setToolbarWidgetColor(@ColorRes int color) {
-            mPickerOptionsBundle.putInt(EXTRA_CROP_TOOLBAR_WIDGET_COLOR, color);
+        public PhotoPickerBuilder setThemeColors(@ColorRes int toolbarColor, @ColorRes int statusBarColor,@ColorRes int toolbarTintColor) {
+            mPickerOptionsBundle.putInt(EXTRA_TOOLBARCOLOR, toolbarColor);
+            mPickerOptionsBundle.putInt(EXTRA_STATUSBARCOLOR, statusBarColor);
+            mPickerOptionsBundle.putInt(EXTRA_TOOLBAR_WIDGET_COLOR, toolbarTintColor);
             return this;
         }
 

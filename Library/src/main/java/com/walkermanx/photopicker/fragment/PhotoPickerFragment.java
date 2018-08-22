@@ -33,6 +33,7 @@ import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
+import com.walkermanx.BaseActivity;
 import com.walkermanx.photopicker.PhotoPicker;
 import com.walkermanx.photopicker.PhotoPickerActivity;
 import com.walkermanx.photopicker.R;
@@ -174,8 +175,8 @@ public class PhotoPickerFragment extends Fragment {
 
         //设置底部Bar背景色 默认和PhotoPickerActivity 中 Toolbar使用相同背景色
         View bottomBar = rootView.findViewById(R.id.bottomBar);
-        if (getActivity() instanceof PhotoPickerActivity) {
-            bottomBar.setBackgroundColor(ContextCompat.getColor(getContext(), ((PhotoPickerActivity) getActivity()).toolbarColor));
+        if (getActivity() instanceof BaseActivity) {
+            bottomBar.setBackgroundColor(ContextCompat.getColor(getContext(), ((BaseActivity) getActivity()).toolbarColor));
         }
 
 

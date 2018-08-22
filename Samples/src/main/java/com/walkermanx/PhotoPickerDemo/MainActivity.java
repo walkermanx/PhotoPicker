@@ -77,8 +77,8 @@ public class MainActivity extends Activity {
                         .setPreviewEnabled(false)
                         .setCrop(true)
                         .setCropXY(1, 1)
-//                        .setCropColors(R.color.colorPrimary, R.color.colorPrimaryDark)
-//                        .setToolbarWidgetColor(android.R.color.holo_red_dark)
+                        .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, android.R.color.holo_red_dark)
+                        .setToolbarTitleMarginStart(R.dimen.__picker_toolbar_title_margin_start)
                         .start(MainActivity.this);
             }
         });
@@ -119,6 +119,10 @@ public class MainActivity extends Activity {
                             PhotoPreview.builder()
                                     .setPhotos(selectedPhotos)
                                     .setCurrentItem(position)
+                                    //设置主题色系 toolBar背景色 statusBar颜色 以及toolBar 文本/overflow Icon着色
+                                    .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, android.R.color.holo_red_dark)
+                                    //设置toolBar标题栏于NavigationIcon的边距
+                                    .setToolbarTitleMarginStart(R.dimen.__picker_toolbar_title_margin_start)
                                     .start(MainActivity.this);
                         }
                     }

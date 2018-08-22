@@ -34,7 +34,7 @@
         android:text="点击下方图片进行预览，放大预览后可长按图片进行下载、分享、取消（示例）等（自定义）操作,已将选择事件回调回Activity（可根据需求自定义）" />
 
 
-    <me.walkermanx.PhotoPickerDemo.LineGridView
+    <com.walkermanx.PhotoPickerDemo.LineGridView
         android:id="@+id/img_grid"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -44,7 +44,7 @@
         android:stretchMode="columnWidth"
         android:verticalSpacing="1.0px">
 
-    </me.walkermanx.PhotoPickerDemo.LineGridView>
+    </com.walkermanx.PhotoPickerDemo.LineGridView>
 
 
 </LinearLayout>

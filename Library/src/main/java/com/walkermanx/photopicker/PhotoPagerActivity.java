@@ -5,10 +5,10 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,7 +16,8 @@ import android.view.View;
 import android.view.WindowManager;
 import java.util.ArrayList;
 import java.util.List;
-import com.walkermanx.photopicker.R;
+
+import com.walkermanx.BaseActivity;
 import com.walkermanx.photopicker.fragment.ImagePagerFragment;
 import static com.walkermanx.photopicker.PhotoPicker.KEY_SELECTED_PHOTOS;
 
@@ -26,11 +27,12 @@ import static com.walkermanx.photopicker.PhotoPicker.KEY_SELECTED_PHOTOS;
 
 // modify PhotoPagerActivity.java add showToolbar
 
-public class PhotoPagerActivity extends AppCompatActivity {
+public class PhotoPagerActivity extends BaseActivity {
 
     private ImagePagerFragment pagerFragment;
 
     private ActionBar actionBar;
+    Toolbar mToolbar;
     private boolean showDelete, showToolbar;
 
     @Override
@@ -58,7 +60,12 @@ public class PhotoPagerActivity extends AppCompatActivity {
         }
         pagerFragment.setPhotos(paths, currentItem,longData);
 
-        Toolbar mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        // Set all of the Toolbar coloring
+        mToolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarColor));
+        mToolbar.setTitleTextColor(ContextCompat.getColor(this, toolbarWidgetColor));
+        mToolbar.setContentInsetStartWithNavigation(getResources().getDimensionPixelSize(titleMarginStart));
+        mToolbar.setTitleMarginStart(getResources().getDimensionPixelSize(titleMarginStart));
         setSupportActionBar(mToolbar);
 
         actionBar = getSupportActionBar();
@@ -71,6 +78,17 @@ public class PhotoPagerActivity extends AppCompatActivity {
             }
         }
 
+        /**
+         * 等待toolbar绘制完成后给其着色  当toolbarWidgetColor !=toolbarWidgetColorVal 时 则判断为通过代码设置了tint着色 则为toolbar 执行 applyTint方法为其着色
+         */
+        if (isManual()) {
+            mToolbar.post(new Runnable() {
+                @Override
+                public void run() {
+                    applyTint(mToolbar, ContextCompat.getColor(mToolbar.getContext(), toolbarWidgetColor));
+                }
+            });
+        }
 
         pagerFragment.getViewPager().addOnPageChangeListener(new ViewPager.SimpleOnPageChangeListener() {
             @Override

@@ -1,6 +1,6 @@
 # [PhotoPicker:](https://github.com/walkermanx/PhotoPicker) Android图片选择器
 
-[![PhotoPicker](https://img.shields.io/badge/PhotoPicker-1.0.1-brightgreen.svg?style=plastic)](http://walkermanx.github.io)
+[![PhotoPicker](https://img.shields.io/badge/PhotoPicker-1.0.2-brightgreen.svg?style=plastic)](http://walkermanx.github.io)
 [![简书个人页](https://img.shields.io/badge/%E7%AE%80%E4%B9%A6-5Mall-orange.svg?style=plastic&colorA=f2715f&colorB=10b23c)](http://www.jianshu.com/u/b9cbfe0a7f35)
 
 
@@ -16,11 +16,15 @@ ps:该项目是在[q805699513](https://github.com/q805699513/PhotoPicker)同学�
 
 **3.** 更新项目gradle到3.1.4
 
-**4.** 修复原有照片选取页面通过代码设置 ToolBar背景、StatusBar色以及ToolBar文本颜色无效的bug
+**4.** 修复原有照片选取页面通过代码设置 ToolBar背景、StatusBar色以及ToolBar文本/icon着色无效的bug
 
 **5.** 在原有ToolBar StatusBar 以及ToolBar文本颜色可通过代码设置的基础上 新增通过读取theme设置来设置三者的属性数值
 
 **6.** 单选照片且需要剪裁照片时 隐藏照片选取页面照片选择框以及顶部右侧文本
+
+**7.** 图片预览页同样支持主题和代码设置主题色  ToolBar背景、StatusBar色以及ToolBar文本/icon着色
+
+**8.** PhotoView和PhotoPicker新增toolBar标题与navigateIcon边距设置
 
 ## 引入：
 
@@ -38,7 +42,7 @@ ps:该项目是在[q805699513](https://github.com/q805699513/PhotoPicker)同学�
 
    ```groovy
 
-    implementation 'com.github.walkermanx:PhotoPicker:1.0.1'
+    implementation 'com.github.walkermanx:PhotoPicker:1.0.2'
 
    ```
 
@@ -52,8 +56,10 @@ PhotoPicker.builder()
     .setCrop(true)
     //设置裁剪比例(X,Y)
     //.setCropXY(1, 1)
-    //设置裁剪界面标题栏颜色，设置裁剪界面状态栏颜色
-    //.setCropColors(R.color.colorPrimary, R.color.colorPrimaryDark)
+    //设置主题色系 toolBar背景色 statusBar颜色 以及toolBar 文本/overflow Icon着色
+    .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, android.R.color.holo_red_dark)
+    //设置toolBar标题栏于NavigationIcon的边距
+    .setToolbarTitleMarginStart(R.dimen.__picker_toolbar_title_margin_start)
     .start(MainActivity.this);
 ```
 
@@ -68,8 +74,6 @@ PhotoPicker.builder()
      .setCrop(true)
      //设置裁剪比例(X,Y)
      .setCropXY(1, 1)
-     //设置裁剪界面标题栏颜色，设置裁剪界面状态栏颜色
-     .setCropColors(R.color.colorPrimary, R.color.colorPrimaryDark)
      .start(MainActivity.this);
 ```
 
@@ -98,6 +102,10 @@ PhotoPicker.builder()
          .setPhotos(selectedPhotos)
          //设置要浏览图片的第position张
          .setCurrentItem(position)
+         //设置主题色系 toolBar背景色 statusBar颜色 以及toolBar 文本/overflow Icon着色
+         .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, android.R.color.holo_red_dark)
+         //设置toolBar标题栏于NavigationIcon的边距
+         .setToolbarTitleMarginStart(R.dimen.__picker_toolbar_title_margin_start)
          .start(MainActivity.this);
   
   
@@ -111,6 +119,10 @@ PhotoPicker.builder()
         //浏览时不要标题栏  
         //setShowDeleteButton浏览时显示删除按钮.
         .setShowToolbar(false)
+         //设置主题色系 toolBar背景色 statusBar颜色 以及toolBar 文本/overflow Icon着色
+         .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, android.R.color.holo_red_dark)
+         //设置toolBar标题栏于NavigationIcon的边距
+         .setToolbarTitleMarginStart(R.dimen.__picker_toolbar_title_margin_start)
         //开启浏览时长按后显示PopuWindow,分享、保存、取消 等，可以自定义。
         .setOnLongClickListData(onLongClickListData)
         .start(PreViewImgActivity.this);   
