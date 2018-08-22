@@ -1,0 +1,36 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+    </style>
+
+
+    <style name="customTheme" parent="Theme.AppCompat.Light.NoActionBar">
+
+        <item name="colorPrimary">@color/colorPrimary</item>
+        <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+
+        <!--<item name="actionBarSize">@dimen/actionBarSize</item>-->
+        <!--<item name="actionBarTheme">@style/ActionbarTheme</item>-->
+        <!--<item name="actionBarPopupTheme">@style/ActionbarPopupTheme</item>-->
+    </style>
+
+    <style name="ActionbarTheme">
+        <!--To change the color of the border -->
+        <item name="colorAccent">#5566ee</item>
+        <!--To change the color of the home icon and the overflow icon  -->
+        <item name="colorControlNormal">@color/colorControlNormal</item>
+        <!--To change the color of the home icon, the overflow icon and the menu icons, -->
+        <item name="android:tint">@color/colorControlNormal</item>
+    </style>
+
+    <style name="ActionbarPopupTheme">
+        <!--To change the background color of the overflow menu -->
+        <item name="android:background">#5566ee</item>
+        <!--To change the text color of the overflow menu-->
+        <item name="android:textColor">#5566ee</item>
+    </style>
+</resources>

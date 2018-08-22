@@ -1,0 +1,18 @@
+<resources>
+
+    <style name="AppTheme" parent="Theme.Design.Light.NoActionBar">
+        <!--toolBar背景-->
+        <item name="android:colorPrimary">@color/colorPrimary</item>
+        <!--status bar 背景-->
+        <item name="android:colorPrimaryDark">@color/colorPrimaryDark</item>
+        <!--toolBar 文本/ icon 着色-->
+        <item name="android:colorControlNormal">@color/colorControlNormal</item>
+    </style>
+
+    <style name="actionBarTheme" parent="ThemeOverlay.AppCompat.Dark.ActionBar">
+        <item name="android:textColorPrimary">#fff</item>
+        <item name="actionBarSize">56dip</item>
+    </style>
+
+
+</resources>
