@@ -37,10 +37,10 @@
 
 
         <activity
-            android:name=".PhotoPickerActivity"/>
+            android:name="com.walkermanx.photopicker.PhotoPickerActivity"/>
 
         <activity
-            android:name=".PhotoPagerActivity" />
+            android:name="com.walkermanx.photopicker.PhotoPagerActivity" />
 
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"

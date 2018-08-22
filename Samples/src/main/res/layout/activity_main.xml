@@ -8,7 +8,7 @@
 
     <Button
         android:id="@+id/button_camera"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dip"
         android:text="拍照并裁剪(裁剪可以设置宽高比例)" />
@@ -16,31 +16,27 @@
 
     <Button
         android:id="@+id/button"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
         android:text="拍照不裁剪" />
 
 
     <Button
         android:id="@+id/button_one_photo"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
         android:text="选择单张图片并裁剪" />
 
     <Button
         android:id="@+id/button_grid"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
         android:text="网图预览" />
 
     <Button
         android:id="@+id/multiselect"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dip"
         android:text="图片多选" />
 
     <TextView
