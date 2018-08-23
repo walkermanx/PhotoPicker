@@ -3,10 +3,14 @@ package com.walkermanx.PhotoPickerDemo;
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.ImageView;
 
@@ -20,7 +24,7 @@ import com.walkermanx.photopicker.PhotoPicker;
 import com.walkermanx.photopicker.PhotoPreview;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private PhotoAdapter photoAdapter;
 
@@ -39,6 +43,25 @@ public class MainActivity extends Activity {
 //        photoOnLongClickManager.setOnLongClickListener(this);
 //        onLongClickListData.add("分享");
 //        onLongClickListData.add("保存");
+
+        Toolbar mToolbar = findViewById(R.id.toolbar);
+        mToolbar.setContentInsetStartWithNavigation(getResources().getDimensionPixelSize(R.dimen.__picker_toolbar_title_margin_start));
+        mToolbar.setTitleMarginStart(getResources().getDimensionPixelSize(R.dimen.__picker_toolbar_title_margin_start));
+        setSupportActionBar(mToolbar);
+        setTitle(R.string.app_name);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                actionBar.setElevation(25);
+            }
+        }
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
+            }
+        });
 
         iv_crop = (ImageView) findViewById(R.id.iv_crop);
 
@@ -77,8 +100,8 @@ public class MainActivity extends Activity {
                         .setPreviewEnabled(false)
                         .setCrop(true)
                         .setCropXY(1, 1)
-                        .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, android.R.color.holo_red_dark)
-                        .setToolbarTitleMarginStart(R.dimen.__picker_toolbar_title_margin_start)
+//                        .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, R.color.colorControlNormal)
+//                        .setToolbarTitleMarginStart(R.dimen.__picker_toolbar_title_margin_start)
                         .start(MainActivity.this);
             }
         });
@@ -120,9 +143,9 @@ public class MainActivity extends Activity {
                                     .setPhotos(selectedPhotos)
                                     .setCurrentItem(position)
                                     //设置主题色系 toolBar背景色 statusBar颜色 以及toolBar 文本/overflow Icon着色
-                                    .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, android.R.color.holo_red_dark)
+//                                    .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, R.color.colorControlNormal)
                                     //设置toolBar标题栏于NavigationIcon的边距
-                                    .setToolbarTitleMarginStart(R.dimen.__picker_toolbar_title_margin_start)
+//                                    .setToolbarTitleMarginStart(R.dimen.__picker_toolbar_title_margin_start)
                                     .start(MainActivity.this);
                         }
                     }

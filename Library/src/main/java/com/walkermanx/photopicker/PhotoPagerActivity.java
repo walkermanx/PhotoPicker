@@ -2,6 +2,8 @@ package com.walkermanx.photopicker;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -14,11 +16,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
+
 import java.util.ArrayList;
 import java.util.List;
 
 import com.walkermanx.BaseActivity;
 import com.walkermanx.photopicker.fragment.ImagePagerFragment;
+
 import static com.walkermanx.photopicker.PhotoPicker.KEY_SELECTED_PHOTOS;
 
 /**
@@ -58,7 +62,7 @@ public class PhotoPagerActivity extends BaseActivity {
             pagerFragment =
                     (ImagePagerFragment) getSupportFragmentManager().findFragmentById(R.id.photoPagerFragment);
         }
-        pagerFragment.setPhotos(paths, currentItem,longData);
+        pagerFragment.setPhotos(paths, currentItem, longData);
 
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         // Set all of the Toolbar coloring
@@ -107,6 +111,13 @@ public class PhotoPagerActivity extends BaseActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         if (showDelete) {
             getMenuInflater().inflate(R.menu.__picker_menu_preview, menu);
+            MenuItem menuItem = menu.findItem(R.id.delete);
+            Drawable menuItemIcon = menuItem.getIcon();
+            if (menuItemIcon != null) {
+                menuItemIcon.mutate();
+                menuItemIcon.setColorFilter(ContextCompat.getColor(this, toolbarWidgetColor), PorterDuff.Mode.SRC_ATOP);
+                menuItem.setIcon(menuItemIcon);
+            }
         }
         return true;
     }

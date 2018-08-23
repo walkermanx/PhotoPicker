@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">PhotoPicker</string>
+    <string name="app_name">PhotoPicker Demo</string>
     <string name="pick_camera">camera</string>
     <string name="pick_photo">Pick Photo</string>
     <string name="pick_photo_without_camera">Pick Photo Without Camera &amp;&amp; Disable Preview</string>

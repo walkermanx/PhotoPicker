@@ -6,6 +6,8 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <include layout="@layout/__picker_toolbar"></include>
+
     <Button
         android:id="@+id/button_camera"
         android:layout_width="match_parent"

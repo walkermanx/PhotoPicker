@@ -1,7 +1,10 @@
 package com.walkermanx.PhotoPickerDemo;
 
-import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.GridView;
@@ -17,7 +20,7 @@ import com.walkermanx.photopicker.event.PhotoOnLongClickManager;
  * Created by q805699513 on 2017/1/23.
  */
 
-public class PreViewImgActivity extends Activity {
+public class PreViewImgActivity extends AppCompatActivity {
 
     private GridView img_grid;
     ArrayList<String> imgData = new ArrayList<>();
@@ -27,9 +30,21 @@ public class PreViewImgActivity extends Activity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_preview_img);
-        findViewById(R.id.back).setOnClickListener(new View.OnClickListener() {
+        Toolbar mToolbar = findViewById(R.id.toolbar);
+        mToolbar.setContentInsetStartWithNavigation(getResources().getDimensionPixelSize(R.dimen.__picker_toolbar_title_margin_start));
+        mToolbar.setTitleMarginStart(getResources().getDimensionPixelSize(R.dimen.__picker_toolbar_title_margin_start));
+        setSupportActionBar(mToolbar);
+        setTitle("网图预览");
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null){
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                actionBar.setElevation(25);
+            }
+        }
+        mToolbar.setNavigationOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View view) {
+            public void onClick(View v) {
                 finish();
             }
         });

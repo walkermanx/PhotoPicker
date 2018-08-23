@@ -1,6 +1,6 @@
-# [PhotoPicker:](https://github.com/walkermanx/PhotoPicker) Android图片选择器
+# [PhotoPicker:](https://github.com/walkermanx/PhotoPicker) Android图片选择器 (仿微信图片选择器)
 
-[![PhotoPicker](https://img.shields.io/badge/PhotoPicker-1.0.2-brightgreen.svg?style=plastic)](http://walkermanx.github.io)
+[![PhotoPicker](https://img.shields.io/badge/PhotoPicker-1.0.3-brightgreen.svg?style=plastic)](http://walkermanx.github.io)
 [![简书个人页](https://img.shields.io/badge/%E7%AE%80%E4%B9%A6-5Mall-orange.svg?style=plastic&colorA=f2715f&colorB=10b23c)](http://www.jianshu.com/u/b9cbfe0a7f35)
 
 
@@ -26,6 +26,13 @@ ps:该项目是在[q805699513](https://github.com/q805699513/PhotoPicker)同学�
 
 **8.** PhotoView和PhotoPicker新增toolBar标题与navigateIcon边距设置
 
+**9.** 优化依赖传递关系
+
+## 演示：
+    <image src="https://github.com/walkermanx/PhotoPicker/blob/master/image/1.gif?raw=true" width="282px"/>
+    <image src="https://github.com/walkermanx/PhotoPicker/blob/master/image/2.gif?raw=true" width="282px"/>
+    <image src="https://github.com/walkermanx/PhotoPicker/blob/master/image/3.gif?raw=true" width="282px"/>
+
 ## 引入：
 
 **1.** 在项目的根目录中找到 __`build.gradle`__ 文件 （*不是module的`build.gradle `文件* ），加入如下代码：
@@ -42,7 +49,7 @@ ps:该项目是在[q805699513](https://github.com/q805699513/PhotoPicker)同学�
 
    ```groovy
 
-    implementation 'com.github.walkermanx:PhotoPicker:1.0.2'
+    implementation 'com.github.walkermanx:PhotoPicker:1.0.3'
 
    ```
 
