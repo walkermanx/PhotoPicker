@@ -29,9 +29,10 @@ ps:该项目是在[q805699513](https://github.com/q805699513/PhotoPicker)同学�
 **9.** 优化依赖传递关系
 
 ## 演示：
-    <image src="https://github.com/walkermanx/PhotoPicker/blob/master/image/1.gif?raw=true" width="282px"/>
-    <image src="https://github.com/walkermanx/PhotoPicker/blob/master/image/2.gif?raw=true" width="282px"/>
-    <image src="https://github.com/walkermanx/PhotoPicker/blob/master/image/3.gif?raw=true" width="282px"/>
+
+<image src="https://github.com/walkermanx/PhotoPicker/blob/master/image/1.gif?raw=true" width="282px"/>
+<image src="/image/2.gif?raw=true" width="282px"/>
+<image src="image/3.gif?raw=true" width="282px"/>
 
 ## 引入：
 
@@ -285,7 +286,7 @@ VideoDecoder 使用 API 27 的一些接口，这可能导致 proguard 发出警�
 ## Thanks
 * [uCrop](https://github.com/Yalantis/uCrop)
 * [Glide](https://github.com/bumptech/glide)
-* [PhotoPicker](https://github.com/donglua/PhotoPicker)
+* [donglua](https://github.com/donglua/PhotoPicker)
 * [q805699513](https://github.com/q805699513/PhotoPicker)
 
 ## License
