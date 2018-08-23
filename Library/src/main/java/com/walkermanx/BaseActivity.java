@@ -34,7 +34,7 @@ public class BaseActivity extends AppCompatActivity {
 
     public int toolbarColor;
     protected int statusbarColor;
-    protected int toolbarWidgetColor;
+    public int toolbarWidgetColor;
     protected int titleMarginStart;
     private boolean isManual;
 

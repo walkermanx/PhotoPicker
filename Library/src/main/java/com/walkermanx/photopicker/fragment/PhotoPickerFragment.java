@@ -173,14 +173,13 @@ public class PhotoPickerFragment extends Fragment {
         recyclerView.setAdapter(photoGridAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
 
+        final Button btSwitchDirectory = rootView.findViewById(R.id.button);
         //设置底部Bar背景色 默认和PhotoPickerActivity 中 Toolbar使用相同背景色
         View bottomBar = rootView.findViewById(R.id.bottomBar);
         if (getActivity() instanceof BaseActivity) {
             bottomBar.setBackgroundColor(ContextCompat.getColor(getContext(), ((BaseActivity) getActivity()).toolbarColor));
+            btSwitchDirectory.setTextColor(ContextCompat.getColor(getContext(), ((BaseActivity) getActivity()).toolbarWidgetColor));
         }
-
-
-        final Button btSwitchDirectory = rootView.findViewById(R.id.button);
 
         listPopupWindow = new ListPopupWindow(getActivity());
         listPopupWindow.setWidth(ListPopupWindow.MATCH_PARENT);

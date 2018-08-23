@@ -29,6 +29,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:textColor="?attr/colorControlNormal"
             android:text="@string/__picker_all_image"
             android:textSize="16sp" />
 
