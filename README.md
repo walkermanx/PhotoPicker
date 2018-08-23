@@ -212,7 +212,7 @@ PhotoPicker.builder()
         <activity
             android:name="com.walkermanx.photopicker.PhotoPagerActivity"
             android:screenOrientation="portrait"
-            android:screenOrientation="portrait"/>
+            android:theme="@style/PhotoTheme"/>
 
         <activity
             android:name="com.yalantis.ucrop.UCropActivity"
