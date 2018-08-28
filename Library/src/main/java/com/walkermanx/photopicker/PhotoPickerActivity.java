@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.Toast;
+
 import com.walkermanx.BaseActivity;
 import com.walkermanx.photopicker.entity.Photo;
 import com.walkermanx.photopicker.event.OnItemCheckListener;
@@ -101,9 +102,9 @@ public class PhotoPickerActivity extends BaseActivity {
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            actionBar.setElevation(25);
-        }
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            actionBar.setElevation(25);
+//        }
         /**
          * 等待toolbar绘制完成后给其着色  当toolbarWidgetColor !=toolbarWidgetColorVal 时 则判断为通过代码设置了tint着色 则为toolbar 执行 applyTint方法为其着色
          */

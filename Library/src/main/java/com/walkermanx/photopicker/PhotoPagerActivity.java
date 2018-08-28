@@ -4,7 +4,6 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -17,11 +16,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.WindowManager;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import com.walkermanx.BaseActivity;
 import com.walkermanx.photopicker.fragment.ImagePagerFragment;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import static com.walkermanx.photopicker.PhotoPicker.KEY_SELECTED_PHOTOS;
 
@@ -77,9 +76,9 @@ public class PhotoPagerActivity extends BaseActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             updateActionBarTitle();
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                actionBar.setElevation(25);
-            }
+//            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//                actionBar.setElevation(25);
+//            }
         }
 
         /**
