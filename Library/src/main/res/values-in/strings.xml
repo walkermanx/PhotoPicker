@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="__picker_all_image">Seluruh gambar</string>
+    <string name="__picker_cancel">Batal</string>
+    <string name="__picker_confirm_to_delete">Yakin untuk dihapus?</string>
+    <string name="__picker_delete">Hapus</string>
+    <string name="__picker_deleted_a_photo">Hapus foto</string>
+    <string name="__picker_done">Selesai</string>
+    <string name="__picker_done_with_count">Selesai(%1$d/%1$d)</string>
+    <string name="__picker_image_count">%1$d</string>
+    <string name="__picker_image_index">%1$d/%1$d</string>
+    <string name="__picker_over_max_count_tips">Anda hanya bisa memilih %1$d gambar</string>
+    <string name="__picker_title">Gambar</string>
+    <string name="__picker_undo">Kembali</string>
+    <string name="__picker_yes">Ya</string>
+
+
+</resources>
