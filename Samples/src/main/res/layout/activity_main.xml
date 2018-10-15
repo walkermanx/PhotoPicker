@@ -13,7 +13,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="10dip"
-        android:text="拍照并裁剪(裁剪可以设置宽高比例)" />
+        android:text="@string/pick_camera" />
 
 
     <Button

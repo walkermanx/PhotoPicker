@@ -12,7 +12,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.LinearLayout;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import com.walkermanx.BaseActivity;
@@ -65,7 +65,7 @@ public class PhotoPickerActivity extends BaseActivity {
     private int columnNumber = DEFAULT_COLUMN_NUMBER;
     private ArrayList<String> originalPhotos = null;
     private boolean isCrop = false;
-    private LinearLayout linear_view;
+    private RelativeLayout linear_view;
     private int cropX;
     private int cropY;
 

@@ -1,14 +1,23 @@
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/linear_view"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/linear_view"
     android:orientation="vertical">
 
-  <include layout="@layout/__picker_toolbar" />
+    <include layout="@layout/__picker_toolbar" />
 
-  <FrameLayout
-      android:id="@+id/container"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent" />
 
-</LinearLayout>
+    <FrameLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@+id/toolbar" />
+
+    <View
+        android:id="@+id/toolbarShadow"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        android:layout_below="@+id/toolbar"
+        android:background="@drawable/toolbar_compat_shadow" />
+
+</RelativeLayout>

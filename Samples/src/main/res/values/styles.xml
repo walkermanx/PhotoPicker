@@ -4,6 +4,7 @@
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorControlNormal">@color/colorControlNormal</item>
+        <item name="homeAsUpIndicator">@mipmap/ic_nav_back</item>
     </style>
 
 
