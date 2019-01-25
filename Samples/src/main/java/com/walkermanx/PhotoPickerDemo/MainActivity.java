@@ -5,13 +5,16 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.transition.TransitionSet;
 import android.view.View;
+import android.view.Window;
 import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
@@ -37,6 +40,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+        }
         setContentView(R.layout.activity_main);
         //添加长按事件
 //        PhotoOnLongClickManager photoOnLongClickManager = PhotoOnLongClickManager.getInstance();
@@ -50,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(mToolbar);
         setTitle(R.string.app_name);
         ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null){
+        if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                 actionBar.setElevation(25);
@@ -63,9 +69,9 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        iv_crop = (ImageView) findViewById(R.id.iv_crop);
+        iv_crop = findViewById(R.id.iv_crop);
 
-        recyclerView = (RecyclerView) findViewById(R.id.recycler_view);
+        recyclerView = findViewById(R.id.recycler_view);
         photoAdapter = new PhotoAdapter(this, selectedPhotos);
 
         recyclerView.setLayoutManager(new StaggeredGridLayoutManager(4, OrientationHelper.VERTICAL));
@@ -139,6 +145,14 @@ public class MainActivity extends AppCompatActivity {
                                     .setSelected(selectedPhotos)
                                     .start(MainActivity.this);
                         } else {
+
+                            ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this, view, selectedPhotos.get(position));
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                                view.setTransitionName(selectedPhotos.get(position));
+                                // Exclude the clicked card from the exit transition (e.g. the card will disappear immediately
+                                // instead of fading out with the rest to prevent an overlapping animation of fade and move).
+                                getWindow().getExitTransition().excludeTarget(view,true);
+                            }
                             PhotoPreview.builder()
                                     .setPhotos(selectedPhotos)
                                     .setCurrentItem(position)
@@ -146,7 +160,7 @@ public class MainActivity extends AppCompatActivity {
 //                                    .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, R.color.colorControlNormal)
                                     //设置toolBar标题栏于NavigationIcon的边距
 //                                    .setToolbarTitleMarginStart(R.dimen.__picker_toolbar_title_margin_start)
-                                    .start(MainActivity.this);
+                                    .start(MainActivity.this, options.toBundle());
                         }
                     }
                 }));

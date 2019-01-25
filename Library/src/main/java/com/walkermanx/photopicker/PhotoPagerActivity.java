@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.v4.content.ContextCompat;
@@ -14,6 +15,7 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 
 import com.walkermanx.BaseActivity;
@@ -40,6 +42,11 @@ public class PhotoPagerActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
+
+        }
+        supportPostponeEnterTransition();
         super.onCreate(savedInstanceState);
         showToolbar = getIntent().getBooleanExtra(PhotoPreview.EXTRA_SHOW_TOOLBAR, true);
         if (!showToolbar) {
@@ -63,7 +70,7 @@ public class PhotoPagerActivity extends BaseActivity {
         }
         pagerFragment.setPhotos(paths, currentItem, longData);
 
-        mToolbar = (Toolbar) findViewById(R.id.toolbar);
+        mToolbar = findViewById(R.id.toolbar);
         // Set all of the Toolbar coloring
         mToolbar.setBackgroundColor(ContextCompat.getColor(this, toolbarColor));
         mToolbar.setTitleTextColor(ContextCompat.getColor(this, toolbarWidgetColor));

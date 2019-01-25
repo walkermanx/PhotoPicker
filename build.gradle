@@ -5,16 +5,20 @@ ext {
 
 buildscript {
     repositories {
+        //阿里云的国内镜像仓库地址 解决依赖下载慢的问题
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         google()
         mavenCentral()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.1.4'
+        classpath 'com.android.tools.build:gradle:3.3.0'
     }
 }
 allprojects {
     repositories {
+        //阿里云的国内镜像仓库地址 解决依赖下载慢的问题
+        maven { url 'http://maven.aliyun.com/nexus/content/groups/public/' }
         google()
         mavenCentral()
         maven { url "https://jitpack.io" }

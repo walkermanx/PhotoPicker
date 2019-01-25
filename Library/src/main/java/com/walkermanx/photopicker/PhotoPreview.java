@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 
 import java.util.ArrayList;
 
@@ -46,6 +48,10 @@ public class PhotoPreview {
             mPreviewIntent = new Intent();
         }
 
+        public void start(@NonNull Activity activity, int requestCode, @Nullable Bundle options) {
+            ActivityCompat.startActivityForResult(activity,getIntent(activity), requestCode, options);
+        }
+
         /**
          * Send the Intent from an Activity with a custom request code
          *
@@ -53,26 +59,11 @@ public class PhotoPreview {
          * @param requestCode requestCode for result
          */
         public void start(@NonNull Activity activity, int requestCode) {
-            activity.startActivityForResult(getIntent(activity), requestCode);
+            start(activity, requestCode, null);
         }
 
-        /**
-         * Send the Intent with a custom request code
-         *
-         * @param fragment    Fragment to receive result
-         * @param requestCode requestCode for result
-         */
-        public void start(@NonNull Context context, @NonNull android.support.v4.app.Fragment fragment, int requestCode) {
-            fragment.startActivityForResult(getIntent(context), requestCode);
-        }
-
-        /**
-         * Send the Intent with a custom request code
-         *
-         * @param fragment Fragment to receive result
-         */
-        public void start(@NonNull Context context, @NonNull android.support.v4.app.Fragment fragment) {
-            fragment.startActivityForResult(getIntent(context), REQUEST_CODE);
+        public void start(@NonNull Activity activity, @Nullable Bundle options) {
+            start(activity, REQUEST_CODE, options);
         }
 
         /**
@@ -81,7 +72,35 @@ public class PhotoPreview {
          * @param activity Activity to receive result
          */
         public void start(@NonNull Activity activity) {
-            start(activity, REQUEST_CODE);
+            start(activity, null);
+        }
+
+        /**
+         * Send the Intent with a custom request code
+         *
+         * @param fragment    Fragment to receive result
+         * @param requestCode requestCode for result
+         */
+        public void start(@NonNull android.support.v4.app.Fragment fragment, int requestCode, @Nullable Bundle options) {
+            if (fragment.getContext() == null) return;
+            fragment.startActivityForResult(getIntent(fragment.getContext()), requestCode, options);
+        }
+
+        /**
+         * Send the Intent with a custom request code
+         *
+         * @param fragment Fragment to receive result
+         */
+        public void start(@NonNull android.support.v4.app.Fragment fragment, int requestCode) {
+            start(fragment, requestCode, null);
+        }
+
+        public void start(@NonNull android.support.v4.app.Fragment fragment, @Nullable Bundle options) {
+            start(fragment, REQUEST_CODE, options);
+        }
+
+        public void start(@NonNull android.support.v4.app.Fragment fragment) {
+            start(fragment, null);
         }
 
         /**
