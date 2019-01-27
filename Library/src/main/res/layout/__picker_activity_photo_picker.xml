@@ -4,7 +4,9 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/__picker_toolbar" />
+    <include
+        android:id="@+id/toolbar"
+        layout="@layout/__picker_toolbar" />
 
 
     <FrameLayout

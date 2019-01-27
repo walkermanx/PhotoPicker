@@ -1,37 +1,34 @@
 package com.walkermanx.photopicker.fragment;
 
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.ListPopupWindow;
-import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.StaggeredGridLayoutManager;
-import android.util.DisplayMetrics;
+import android.transition.TransitionSet;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.WindowManager;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.RequestManager;
 import com.walkermanx.BaseActivity;
 import com.walkermanx.photopicker.PhotoPicker;
@@ -41,6 +38,7 @@ import com.walkermanx.photopicker.adapter.PhotoGridAdapter;
 import com.walkermanx.photopicker.adapter.PopupDirectoryListAdapter;
 import com.walkermanx.photopicker.entity.Photo;
 import com.walkermanx.photopicker.entity.PhotoDirectory;
+import com.walkermanx.photopicker.event.OnItemCheckListener;
 import com.walkermanx.photopicker.event.OnPhotoClickListener;
 import com.walkermanx.photopicker.utils.AndroidLifecycleUtils;
 import com.walkermanx.photopicker.utils.ImageCaptureManager;
@@ -52,6 +50,7 @@ import com.yalantis.ucrop.UCrop;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
@@ -118,7 +117,6 @@ public class PhotoPickerFragment extends Fragment {
         captureManager = new ImageCaptureManager(getActivity());
 
         itemHeight = getResources().getDimensionPixelOffset(R.dimen.__picker_item_directory_height);
-        mGlideRequestManager = Glide.with(this);
 
         directories = new ArrayList<>();
         originalPhotos = getArguments().getStringArrayList(EXTRA_ORIGIN);
@@ -131,9 +129,10 @@ public class PhotoPickerFragment extends Fragment {
         boolean showCamera = getArguments().getBoolean(EXTRA_CAMERA, true);
         boolean previewEnable = getArguments().getBoolean(PhotoPicker.EXTRA_PREVIEW_ENABLED, true);
 
-        photoGridAdapter = new PhotoGridAdapter(getActivity(), mGlideRequestManager, directories, originalPhotos, column, maxCount <= 1 && isCrop);
+        photoGridAdapter = new PhotoGridAdapter(getContext(), this, directories, originalPhotos, column, maxCount <= 1 && isCrop);
         photoGridAdapter.setShowCamera(showCamera);
         photoGridAdapter.setPreviewEnable(previewEnable);
+        mGlideRequestManager = photoGridAdapter.requestManager;
 
         Bundle mediaStoreArgs = new Bundle();
 
@@ -160,15 +159,16 @@ public class PhotoPickerFragment extends Fragment {
 
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         final View rootView = inflater.inflate(R.layout.__picker_fragment_photo_picker, container, false);
 
         listAdapter = new PopupDirectoryListAdapter(mGlideRequestManager, directories);
         recyclerView = rootView.findViewById(R.id.rv_photos);
-        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(column, OrientationHelper.VERTICAL);
-        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+//        StaggeredGridLayoutManager layoutManager = new StaggeredGridLayoutManager(column, OrientationHelper.VERTICAL);
+//        layoutManager.setGapStrategy(StaggeredGridLayoutManager.GAP_HANDLING_MOVE_ITEMS_BETWEEN_SPANS);
+        GridLayoutManager layoutManager = new GridLayoutManager(getContext(), column);
         recyclerView.setLayoutManager(layoutManager);
         recyclerView.setAdapter(photoGridAdapter);
         recyclerView.setItemAnimator(new DefaultItemAnimator());
@@ -177,11 +177,11 @@ public class PhotoPickerFragment extends Fragment {
         //设置底部Bar背景色 默认和PhotoPickerActivity 中 Toolbar使用相同背景色
         View bottomBar = rootView.findViewById(R.id.bottomBar);
         if (getActivity() instanceof BaseActivity) {
-            bottomBar.setBackgroundColor(ContextCompat.getColor(getContext(), ((BaseActivity) getActivity()).toolbarColor));
-            btSwitchDirectory.setTextColor(ContextCompat.getColor(getContext(), ((BaseActivity) getActivity()).toolbarWidgetColor));
+            bottomBar.setBackgroundColor(ContextCompat.getColor(getActivity(), ((BaseActivity) getActivity()).toolbarColor));
+            btSwitchDirectory.setTextColor(ContextCompat.getColor(getActivity(), ((BaseActivity) getActivity()).toolbarWidgetColor));
         }
 
-        listPopupWindow = new ListPopupWindow(getActivity());
+        listPopupWindow = new ListPopupWindow(container.getContext());
         listPopupWindow.setWidth(ListPopupWindow.MATCH_PARENT);
         listPopupWindow.setAnchorView(bottomBar);
         listPopupWindow.setAdapter(listAdapter);
@@ -204,6 +204,16 @@ public class PhotoPickerFragment extends Fragment {
             }
         });
 
+        photoGridAdapter.setOnItemCheckListener(new OnItemCheckListener() {
+            @Override
+            public boolean onItemCheck(int position, Photo path, int selectedItemCount) {
+                if (getContext() instanceof OnItemCheckListener) {
+                    return ((OnItemCheckListener) getContext()).onItemCheck(position, path, selectedItemCount);
+                }
+                return false;
+            }
+        });
+
         photoGridAdapter.setOnPhotoClickListener(new OnPhotoClickListener() {
             @Override
             public void onClick(View v, int position, boolean showCamera) {
@@ -217,7 +227,28 @@ public class PhotoPickerFragment extends Fragment {
                         ImagePagerFragment.newInstance(photos, index, screenLocation, v.getWidth(),
                                 v.getHeight());
 
-                ((PhotoPickerActivity) getActivity()).addImagePagerFragment(imagePagerFragment);
+                imagePagerFragment.setTransitionFromActivity(false);
+                PhotoPickerActivity.currentPosition = position;
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    // Exclude the clicked card from the exit transition (e.g. the card will disappear immediately
+                    // instead of fading out with the rest to prevent an overlapping animation of fade and move).
+                    if (getExitTransition() instanceof TransitionSet) {
+                        ((TransitionSet) getExitTransition()).excludeTarget((View) v.getParent(), true);
+                    }
+
+                    getFragmentManager()
+                            .beginTransaction()
+                            .setReorderingAllowed(true) // Optimize for shared element transition
+                            .addSharedElement(v, v.getTransitionName())
+                            .replace(R.id.container, imagePagerFragment, imagePagerFragment.getClass().getSimpleName())
+                            .addToBackStack(null)
+                            .commit();
+                } else if (getActivity() instanceof PhotoPickerActivity) {
+                    ((PhotoPickerActivity) getActivity()).addImagePagerFragment(imagePagerFragment);
+                }
+
+
             }
         });
 
@@ -265,7 +296,80 @@ public class PhotoPickerFragment extends Fragment {
             }
         });
 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            prepareTransitions();
+            postponeEnterTransition();
+        }
+
         return rootView;
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        scrollToPosition();
+    }
+
+    /**
+     * Scrolls the recycler view to show the last viewed item in the grid. This is important when
+     * navigating back from the grid.
+     */
+    private void scrollToPosition() {
+        recyclerView.addOnLayoutChangeListener(new View.OnLayoutChangeListener() {
+            @Override
+            public void onLayoutChange(View v,
+                                       int left,
+                                       int top,
+                                       int right,
+                                       int bottom,
+                                       int oldLeft,
+                                       int oldTop,
+                                       int oldRight,
+                                       int oldBottom) {
+                recyclerView.removeOnLayoutChangeListener(this);
+                final RecyclerView.LayoutManager layoutManager = recyclerView.getLayoutManager();
+                View viewAtPosition = layoutManager.findViewByPosition(PhotoPickerActivity.currentPosition);
+                // Scroll to position if the view for the current position is null (not currently part of
+                // layout manager children), or it's not completely visible.
+                if (viewAtPosition == null || layoutManager
+                        .isViewPartiallyVisible(viewAtPosition, false, true)) {
+                    recyclerView.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            layoutManager.scrollToPosition(PhotoPickerActivity.currentPosition);
+                        }
+                    });
+                }
+            }
+        });
+    }
+
+    /**
+     * Prepares the shared element transition to the pager fragment, as well as the other transitions
+     * that affect the flow.
+     */
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    private void prepareTransitions() {
+//        setExitTransition(TransitionInflater.from(getContext())
+//                .inflateTransition(R.transition.__picker_grid_exit_transition));
+
+        // A similar mapping is set at the ImagePagerFragment with a setEnterSharedElementCallback.
+        setExitSharedElementCallback(
+                new SharedElementCallback() {
+                    @Override
+                    public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                        // Locate the ViewHolder for the clicked position.
+
+                        RecyclerView.ViewHolder selectedViewHolder = recyclerView
+                                .findViewHolderForAdapterPosition(PhotoPickerActivity.currentPosition);
+                        if (selectedViewHolder == null || selectedViewHolder.itemView == null) {
+                            return;
+                        }
+
+                        // Map the first shared element name to the child ImageView.
+                        sharedElements.put(names.get(0), selectedViewHolder.itemView.findViewById(R.id.iv_photo));
+                    }
+                });
     }
 
 

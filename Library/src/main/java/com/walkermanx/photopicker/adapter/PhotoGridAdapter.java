@@ -1,6 +1,12 @@
 package com.walkermanx.photopicker.adapter;
 
 import android.content.Context;
+import android.graphics.drawable.Drawable;
+import android.os.Build;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -9,9 +15,15 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
 
+import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
+import com.walkermanx.photopicker.PhotoPickerActivity;
 import com.walkermanx.photopicker.R;
 import com.walkermanx.photopicker.entity.Photo;
 import com.walkermanx.photopicker.entity.PhotoDirectory;
@@ -23,6 +35,7 @@ import com.walkermanx.photopicker.utils.MediaStoreHelper;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by donglua on 15/5/31.
@@ -30,7 +43,7 @@ import java.util.List;
 public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoViewHolder> {
 
     private LayoutInflater inflater;
-    private RequestManager glide;
+    public final RequestManager requestManager;
     private RequestOptions options;
 
     private OnItemCheckListener onItemCheckListener = null;
@@ -48,11 +61,13 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
 
     private int imageSize;
     private int columnNumber = COL_NUMBER_DEFAULT;
+    private Fragment fragment;
 
 
-    public PhotoGridAdapter(Context context, RequestManager requestManager, List<PhotoDirectory> photoDirectories) {
+    public PhotoGridAdapter(Context context, Fragment fragment, List<PhotoDirectory> photoDirectories) {
+        this.fragment = fragment;
         this.photoDirectories = photoDirectories;
-        this.glide = requestManager;
+        this.requestManager = Glide.with(fragment);
         inflater = LayoutInflater.from(context);
         setColumnNumber(context, columnNumber);
         this.options = new RequestOptions()
@@ -64,8 +79,8 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
                 .priority(Priority.HIGH);
     }
 
-    public PhotoGridAdapter(Context context, RequestManager requestManager, List<PhotoDirectory> photoDirectories, ArrayList<String> orginalPhotos, int colNum, boolean hideSelectFrame) {
-        this(context, requestManager, photoDirectories);
+    public PhotoGridAdapter(Context context, Fragment fragment, List<PhotoDirectory> photoDirectories, ArrayList<String> orginalPhotos, int colNum, boolean hideSelectFrame) {
+        this(context, fragment, photoDirectories);
         setColumnNumber(context, colNum);
         selectedPhotos = new ArrayList<>();
         if (orginalPhotos != null) selectedPhotos.addAll(orginalPhotos);
@@ -88,8 +103,9 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
     }
 
 
+    @NonNull
     @Override
-    public PhotoViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public PhotoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         final View itemView = inflater.inflate(R.layout.__picker_item_photo, parent, false);
         final PhotoViewHolder holder = new PhotoViewHolder(itemView);
         if (viewType == ITEM_TYPE_CAMERA) {
@@ -110,9 +126,22 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
         return holder;
     }
 
+    private void onPhotoLoadCompleted(PhotoViewHolder holder) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            // Call startPostponedEnterTransition only when the 'selected' image loading is completed.
+            if (PhotoPickerActivity.currentPosition != holder.getAdapterPosition()) {
+                return;
+            }
+            if (holder.enterTransitionStarted.getAndSet(true)) {
+                return;
+            }
+
+            fragment.startPostponedEnterTransition();
+        }
+    }
 
     @Override
-    public void onBindViewHolder(final PhotoViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull final PhotoViewHolder holder, int position) {
 
         if (getItemViewType(position) == ITEM_TYPE_PHOTO) {
 
@@ -124,12 +153,13 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
             } else {
                 photo = photos.get(position);
             }
+            // Set the string value of the image resource as the unique transition name for the view.
+            ViewCompat.setTransitionName(holder.ivPhoto, photo.getPath());
 
             boolean canLoadImage = AndroidLifecycleUtils.canLoadImage(holder.ivPhoto.getContext());
 
             if (canLoadImage) {
-                glide
-                        .load(new File(photo.getPath()))
+                requestManager.load(new File(photo.getPath()))
 //                        .centerCrop()
 //                        .dontAnimate()
                         .thumbnail(0.5f)
@@ -137,6 +167,21 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
 //                        .placeholder(R.drawable.__picker_ic_photo_black_48dp)
 //                        .error(R.drawable.__picker_ic_broken_image_black_48dp)
                         .apply(options)
+                        .listener(new RequestListener<Drawable>() {
+                            @Override
+                            public boolean onLoadFailed(@Nullable GlideException e, Object model,
+                                                        Target<Drawable> target, boolean isFirstResource) {
+                                onPhotoLoadCompleted(holder);
+                                return false;
+                            }
+
+                            @Override
+                            public boolean onResourceReady(Drawable resource, Object model, Target<Drawable>
+                                    target, DataSource dataSource, boolean isFirstResource) {
+                                onPhotoLoadCompleted(holder);
+                                return false;
+                            }
+                        })
                         .into(holder.ivPhoto);
             }
 
@@ -190,8 +235,7 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
 
     @Override
     public int getItemCount() {
-        int photosCount =
-                photoDirectories.size() == 0 ? 0 : getCurrentPhotos().size();
+        int photosCount = photoDirectories.size() == 0 ? 0 : getCurrentPhotos().size();
         if (showCamera()) {
             return photosCount + 1;
         }
@@ -202,11 +246,13 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
     public static class PhotoViewHolder extends RecyclerView.ViewHolder {
         private ImageView ivPhoto;
         private View vSelected;
+        private AtomicBoolean enterTransitionStarted;
 
         public PhotoViewHolder(View itemView) {
             super(itemView);
-            ivPhoto = (ImageView) itemView.findViewById(R.id.iv_photo);
+            ivPhoto = itemView.findViewById(R.id.iv_photo);
             vSelected = itemView.findViewById(R.id.v_selected);
+            enterTransitionStarted = new AtomicBoolean();
         }
     }
 
@@ -228,14 +274,9 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
 
     public ArrayList<String> getSelectedPhotoPaths() {
         ArrayList<String> selectedPhotoPaths = new ArrayList<>(getSelectedItemCount());
-
-        for (String photo : selectedPhotos) {
-            selectedPhotoPaths.add(photo);
-        }
-
+        selectedPhotoPaths.addAll(selectedPhotos);
         return selectedPhotoPaths;
     }
-
 
     public void setShowCamera(boolean hasCamera) {
         this.hasCamera = hasCamera;
@@ -250,9 +291,8 @@ public class PhotoGridAdapter extends SelectableAdapter<PhotoGridAdapter.PhotoVi
     }
 
     @Override
-    public void onViewRecycled(PhotoViewHolder holder) {
-//        Glide.clear(holder.ivPhoto);
-        glide.clear(holder.ivPhoto);
+    public void onViewRecycled(@NonNull PhotoViewHolder holder) {
+        requestManager.clear(holder.ivPhoto);
         super.onViewRecycled(holder);
     }
 }

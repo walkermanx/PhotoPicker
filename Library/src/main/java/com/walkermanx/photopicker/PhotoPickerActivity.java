@@ -21,6 +21,7 @@ import com.walkermanx.photopicker.event.OnItemCheckListener;
 import com.walkermanx.photopicker.fragment.ImagePagerFragment;
 import com.walkermanx.photopicker.fragment.PhotoPickerFragment;
 import com.yalantis.ucrop.UCrop;
+import com.yalantis.ucrop.UCropActivity;
 
 import java.io.File;
 import java.text.SimpleDateFormat;
@@ -44,7 +45,7 @@ import static com.walkermanx.photopicker.PhotoPicker.EXTRA_SHOW_CAMERA;
 import static com.walkermanx.photopicker.PhotoPicker.EXTRA_SHOW_GIF;
 import static com.walkermanx.photopicker.PhotoPicker.KEY_SELECTED_PHOTOS;
 
-public class PhotoPickerActivity extends BaseActivity {
+public class PhotoPickerActivity extends BaseActivity implements OnItemCheckListener, ImagePagerFragment.CallBack {
 
     private PhotoPickerFragment pickerFragment;
     private ImagePagerFragment imagePagerFragment;
@@ -68,14 +69,27 @@ public class PhotoPickerActivity extends BaseActivity {
     private RelativeLayout linear_view;
     private int cropX;
     private int cropY;
+    public static int currentPosition;
+    private final String KEY_CURRENT_POSITION = "KEY_CURRENT_POSITION";
+    boolean showCamera;
 
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        outState.putInt(KEY_CURRENT_POSITION, currentPosition);
+    }
 
     @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS | Window.FEATURE_ACTIVITY_TRANSITIONS);
+        setContentView(R.layout.__picker_activity_photo_picker);
+        if (savedInstanceState != null) {
+            currentPosition = savedInstanceState.getInt(KEY_CURRENT_POSITION, 0);
+        }
 
-        boolean showCamera = getIntent().getBooleanExtra(EXTRA_SHOW_CAMERA, true);
+        showCamera = getIntent().getBooleanExtra(EXTRA_SHOW_CAMERA, true);
         boolean openCamera = getIntent().getBooleanExtra(EXTRA_OPEN_CAMERA, false);
 
         isCrop = getIntent().getBooleanExtra(EXTRA_OPEN_CROP, false);
@@ -88,7 +102,6 @@ public class PhotoPickerActivity extends BaseActivity {
 
         setShowGif(showGif);
 
-        setContentView(R.layout.__picker_activity_photo_picker);
         linear_view = findViewById(R.id.linear_view);
 
         mToolbar = findViewById(R.id.toolbar);
@@ -129,53 +142,52 @@ public class PhotoPickerActivity extends BaseActivity {
                     .beginTransaction()
                     .replace(R.id.container, pickerFragment, "tag")
                     .commit();
-            getSupportFragmentManager().executePendingTransactions();
+//            getSupportFragmentManager().executePendingTransactions();
         }
 
-
-        pickerFragment.getPhotoGridAdapter().setOnItemCheckListener(new OnItemCheckListener() {
-            @Override
-            public boolean onItemCheck(int position, Photo photo, final int selectedItemCount) {
-
-                if (menuDoneItem != null)
-                    menuDoneItem.setEnabled(selectedItemCount > 0);
-
-                if (maxCount <= 1) {
-                    if (isCrop) {
-                        openCropActivity(photo.getPath());
-                        return false;
-                    }
-                    List<String> photos = pickerFragment.getPhotoGridAdapter().getSelectedPhotos();
-                    if (!photos.contains(photo.getPath())) {
-                        photos.clear();
-                        pickerFragment.getPhotoGridAdapter().notifyDataSetChanged();
-                    }
-                    return true;
-                }
-
-
-                if (selectedItemCount > maxCount) {
-                    Toast.makeText(getActivity(), getString(R.string.__picker_over_max_count_tips, maxCount),
-                            LENGTH_LONG).show();
-                    return false;
-                }
-                if (!isCrop) {
-                    menuDoneItem.setTitle(getString(R.string.__picker_done_with_count, selectedItemCount, maxCount));
-                }
-                return true;
-            }
-        });
-
-
-        if (savedInstanceState == null) {
-            if (openCamera) {
-                linear_view.setVisibility(View.GONE);
-                pickerFragment.activityCamera();
-            }
+        if (openCamera) {
+            if (savedInstanceState == null)
+                getSupportFragmentManager().executePendingTransactions();
+            linear_view.setVisibility(View.GONE);
+            pickerFragment.activityCamera();
         }
+
     }
 
+    @Override
+    public void onScrollToPosition(int curPos) {
+        currentPosition = showCamera ? curPos + 1 : curPos;
+    }
 
+    @Override
+    public boolean onItemCheck(int position, Photo photo, int selectedItemCount) {
+        if (menuDoneItem != null)
+            menuDoneItem.setEnabled(selectedItemCount > 0);
+
+        if (maxCount <= 1) {
+            if (isCrop) {
+                openCropActivity(photo.getPath());
+                return false;
+            }
+            List<String> photos = pickerFragment.getPhotoGridAdapter().getSelectedPhotos();
+            if (!photos.contains(photo.getPath())) {
+                photos.clear();
+                pickerFragment.getPhotoGridAdapter().notifyDataSetChanged();
+            }
+            return true;
+        }
+
+
+        if (selectedItemCount > maxCount) {
+            Toast.makeText(getActivity(), getString(R.string.__picker_over_max_count_tips, maxCount),
+                    LENGTH_LONG).show();
+            return false;
+        }
+        if (!isCrop) {
+            menuDoneItem.setTitle(getString(R.string.__picker_done_with_count, selectedItemCount, maxCount));
+        }
+        return true;
+    }
 
     public void openCropActivity(String path) {
         String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss", Locale.ENGLISH).format(new Date());
@@ -189,7 +201,7 @@ public class PhotoPickerActivity extends BaseActivity {
         options.setToolbarColor(ContextCompat.getColor(this, toolbarColor));
         options.setStatusBarColor(ContextCompat.getColor(this, statusbarColor));
         options.setToolbarWidgetColor(ContextCompat.getColor(this, toolbarWidgetColor));
-        options.setAllowedGestures(3, 3, 3);
+        options.setAllowedGestures(UCropActivity.ALL, UCropActivity.ALL, UCropActivity.ALL);
 
         UCrop.of(Uri.fromFile(new File(path)), Uri.fromFile(new File(getActivity().getCacheDir(), imageFileName)))
                 .withAspectRatio(cropX, cropY)
@@ -221,7 +233,7 @@ public class PhotoPickerActivity extends BaseActivity {
         this.imagePagerFragment = imagePagerFragment;
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.container, this.imagePagerFragment)
+                .replace(R.id.container, imagePagerFragment)
                 .addToBackStack(null)
                 .commit();
     }

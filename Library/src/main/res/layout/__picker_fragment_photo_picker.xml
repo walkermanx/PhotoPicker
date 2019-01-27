@@ -7,21 +7,23 @@
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_photos"
         android:layout_width="match_parent"
-        android:layout_height="0dip"
+        android:layout_height="0dp"
         android:layout_weight="1"
         android:gravity="center" />
 
 
     <View
+        android:id="@+id/ll_divider"
         android:layout_width="match_parent"
-        android:layout_height="2px"
+        android:layout_height="1dp"
         android:background="#eee" />
 
     <LinearLayout
         android:id="@+id/bottomBar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:orientation="horizontal"
+        android:showDividers="beginning">
 
         <Button
             android:id="@+id/button"
@@ -29,18 +31,18 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:gravity="center"
-            android:textColor="?attr/colorControlNormal"
             android:text="@string/__picker_all_image"
+            android:textColor="?attr/colorControlNormal"
             android:textSize="16sp" />
 
         <ImageView
             android:id="@+id/iv_folder_arrow"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_centerVertical="true"
             android:layout_gravity="center_vertical"
-            android:layout_marginBottom="-5dp"
+            android:layout_marginStart="-8dp"
             android:layout_marginLeft="-8dp"
+            android:layout_marginBottom="-5dp"
             android:src="@drawable/__picker_ic_gf_triangle_arrow"
             android:tint="@color/__picker_common_primary" />
 

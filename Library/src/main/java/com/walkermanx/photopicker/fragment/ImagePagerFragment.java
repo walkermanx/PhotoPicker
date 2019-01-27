@@ -1,12 +1,12 @@
 package com.walkermanx.photopicker.fragment;
 
-import android.annotation.TargetApi;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.view.ViewPager;
@@ -18,17 +18,18 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.view.animation.AccelerateInterpolator;
 import android.view.animation.DecelerateInterpolator;
-import android.widget.ImageView;
+
 import com.nineoldandroids.animation.Animator;
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
+import com.walkermanx.photopicker.R;
 import com.walkermanx.photopicker.adapter.PhotoPagerAdapter;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import com.walkermanx.photopicker.R;
 
 /**
  * Created by donglua on 15/6/21.
@@ -60,7 +61,7 @@ public class ImagePagerFragment extends Fragment {
     private int thumbnailLeft = 0;
     private int thumbnailWidth = 0;
     private int thumbnailHeight = 0;
-    private boolean transitionFromActivity=true;
+    private boolean transitionFromActivity = true;
 
     private boolean hasAnim = false;
 
@@ -69,7 +70,7 @@ public class ImagePagerFragment extends Fragment {
     private int currentItem = 0;
 
 
-    public static ImagePagerFragment newInstance(List<String> paths, int currentItem) {
+    private static ImagePagerFragment newInstance(List<String> paths, int currentItem) {
 
         ImagePagerFragment f = new ImagePagerFragment();
 
@@ -91,7 +92,7 @@ public class ImagePagerFragment extends Fragment {
         f.getArguments().putInt(ARG_THUMBNAIL_TOP, screenLocation[1]);
         f.getArguments().putInt(ARG_THUMBNAIL_WIDTH, thumbnailWidth);
         f.getArguments().putInt(ARG_THUMBNAIL_HEIGHT, thumbnailHeight);
-        f.getArguments().putBoolean(ARG_HAS_ANIM, true);
+        f.getArguments().putBoolean(ARG_HAS_ANIM, Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP);
 
         return f;
     }
@@ -124,7 +125,6 @@ public class ImagePagerFragment extends Fragment {
             String[] pathArr = bundle.getStringArray(ARG_PATH);
             paths.clear();
             if (pathArr != null) {
-
                 paths = new ArrayList<>(Arrays.asList(pathArr));
             }
 
@@ -148,13 +148,19 @@ public class ImagePagerFragment extends Fragment {
 
         View rootView = inflater.inflate(R.layout.__picker_picker_fragment_image_pager, container, false);
 
-        mViewPager = (ViewPager) rootView.findViewById(R.id.vp_photos);
+        mViewPager = rootView.findViewById(R.id.vp_photos);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(currentItem);
         mViewPager.setOffscreenPageLimit(5);
 
-        if (!transitionFromActivity) {// 判断如果启动SharedElementTransition动画的执行者不是来自 activity  则说明其为fragment 则执行fragment间转场动画准备操作
-            prepareSharedElementTransition();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            if (!transitionFromActivity) {// 判断如果启动SharedElementTransition动画的执行者不是来自 activity  则说明其为fragment 则执行fragment间转场动画准备操作
+                prepareSharedElementTransition();
+                // Avoid a postponeEnterTransition on orientation change, and postpone only of first creation.
+                if (savedInstanceState == null) {
+                    postponeEnterTransition();
+                }
+            }
         }
 
 
@@ -207,23 +213,32 @@ public class ImagePagerFragment extends Fragment {
     }
 
     @Override
-    public void startPostponedEnterTransition() {
-        if (transitionFromActivity) {
-            if (getActivity() != null)
-                getActivity().supportStartPostponedEnterTransition();
-        } else {
-            super.startPostponedEnterTransition();
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getViewPager().post(new Runnable() {
+                @Override
+                public void run() {
+                    if (transitionFromActivity) {
+                        if (getActivity() != null)
+                            getActivity().startPostponedEnterTransition();
+                    } else {
+                        startPostponedEnterTransition();
+                    }
+                }
+            });
         }
+
     }
 
     /**
      * Prepares the shared element transition from and back to the grid fragment.
      */
-    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
     private void prepareSharedElementTransition() {
         Transition transition =
                 TransitionInflater.from(getContext())
-                        .inflateTransition(R.transition.image_shared_element_transition);
+                        .inflateTransition(R.transition.__picker_image_shared_element_transition);
         setSharedElementEnterTransition(transition);
 
         // A similar mapping is set at the GridFragment with a setExitSharedElementCallback.
@@ -235,17 +250,14 @@ public class ImagePagerFragment extends Fragment {
                         // visible). To locate the fragment, call instantiateItem with the selection position.
                         // At this stage, the method will simply return the fragment at the position and will
                         // not create a new one.
-                        if (mViewPager.getAdapter() == null) return;
-
-                        View itemView = (View) mViewPager.getAdapter().instantiateItem(mViewPager, currentItem);
-
-                        ImageView imageView = itemView.findViewById(R.id.iv_pager);
-                        if (imageView == null) {
+//                        View itemView = (View) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
+                        View itemView = mViewPager.getChildAt(0);
+//                        ImageView imageView = itemView.findViewById(R.id.iv_pager);
+                        if (itemView == null) {
                             return;
                         }
-
                         // Map the first shared element name to the  ImageView.
-                        sharedElements.put(names.get(0), imageView);
+                        sharedElements.put(names.get(0), itemView);
                     }
                 });
     }
@@ -392,8 +404,6 @@ public class ImagePagerFragment extends Fragment {
 
     public interface CallBack {
         void onScrollToPosition(int curPos);
-
-        void onImageLoaded(int imagePos, boolean loadedSuccessfully);
     }
 
 }

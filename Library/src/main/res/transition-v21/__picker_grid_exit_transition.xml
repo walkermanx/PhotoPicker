@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<transitionSet xmlns:android="http://schemas.android.com/apk/res/android"
+    android:duration="375"
+    android:interpolator="@android:interpolator/fast_out_slow_in">
+    <fade>
+        <targets>
+            <target android:targetId="@id/photoCard" />
+            <target android:targetId="@id/bottomBar" />
+            <target android:targetId="@id/ll_divider" />
+        </targets>
+    </fade>
+</transitionSet>

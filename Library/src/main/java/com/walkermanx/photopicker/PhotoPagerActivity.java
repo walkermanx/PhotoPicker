@@ -7,11 +7,15 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.SharedElementCallback;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.transition.Transition;
+import android.transition.TransitionInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -23,7 +27,9 @@ import com.walkermanx.photopicker.fragment.ImagePagerFragment;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
+import static com.walkermanx.photopicker.PhotoPicker.KEY_SELECTED_INDEX;
 import static com.walkermanx.photopicker.PhotoPicker.KEY_SELECTED_PHOTOS;
 
 /**
@@ -42,17 +48,13 @@ public class PhotoPagerActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS);
-
-        }
-        supportPostponeEnterTransition();
         super.onCreate(savedInstanceState);
         showToolbar = getIntent().getBooleanExtra(PhotoPreview.EXTRA_SHOW_TOOLBAR, true);
         if (!showToolbar) {
             getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN, WindowManager.LayoutParams.FLAG_FULLSCREEN);
         }
 
+        prepareSharedElementTransition();
         setContentView(R.layout.__picker_activity_photo_pager);
 
         int currentItem = getIntent().getIntExtra(PhotoPreview.EXTRA_CURRENT_ITEM, 0);
@@ -65,8 +67,7 @@ public class PhotoPagerActivity extends BaseActivity {
         }
 
         if (pagerFragment == null) {
-            pagerFragment =
-                    (ImagePagerFragment) getSupportFragmentManager().findFragmentById(R.id.photoPagerFragment);
+            pagerFragment = (ImagePagerFragment) getSupportFragmentManager().findFragmentById(R.id.photoPagerFragment);
         }
         pagerFragment.setPhotos(paths, currentItem, longData);
 
@@ -112,6 +113,34 @@ public class PhotoPagerActivity extends BaseActivity {
         }
     }
 
+    private void prepareSharedElementTransition() {
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().requestFeature(Window.FEATURE_CONTENT_TRANSITIONS | Window.FEATURE_ACTIVITY_TRANSITIONS);
+            Transition transition = TransitionInflater.from(this).inflateTransition(R.transition.__picker_image_shared_element_transition);
+            getWindow().setSharedElementEnterTransition(transition);
+
+
+            ActivityCompat.setEnterSharedElementCallback(this, new SharedElementCallback() {
+                @Override
+                public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
+                    if (pagerFragment.getView() == null) {
+                        return;
+                    }
+
+                    View itemView = pagerFragment.getViewPager().getChildAt(0);
+//                        ImageView imageView = itemView.findViewById(R.id.iv_pager);
+                    if (itemView == null) {
+                        return;
+                    }
+
+                    sharedElements.put(names.get(0), itemView);
+                }
+            });
+
+            postponeEnterTransition();
+        }
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -131,11 +160,10 @@ public class PhotoPagerActivity extends BaseActivity {
 
     @Override
     public void onBackPressed() {
-
         Intent intent = new Intent();
         intent.putExtra(KEY_SELECTED_PHOTOS, pagerFragment.getPaths());
+        intent.putExtra(KEY_SELECTED_INDEX, pagerFragment.getCurrentItem());
         setResult(RESULT_OK, intent);
-        finish();
         super.onBackPressed();
     }
 

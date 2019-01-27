@@ -33,7 +33,6 @@ public class PhotoPreview {
     public final static String EXTRA_SHOW_DELETE = "show_delete";
     public final static String EXTRA_SHOW_TOOLBAR = "show_toolbar";
 
-
     public static PhotoPreviewBuilder builder() {
         return new PhotoPreviewBuilder();
     }
@@ -49,7 +48,7 @@ public class PhotoPreview {
         }
 
         public void start(@NonNull Activity activity, int requestCode, @Nullable Bundle options) {
-            ActivityCompat.startActivityForResult(activity,getIntent(activity), requestCode, options);
+            ActivityCompat.startActivityForResult(activity, getIntent(activity), requestCode, options);
         }
 
         /**

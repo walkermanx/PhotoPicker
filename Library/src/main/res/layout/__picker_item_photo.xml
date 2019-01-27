@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <com.walkermanx.photopicker.widget.SquareItemLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/photoCard"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
@@ -17,13 +18,17 @@
         android:id="@+id/v_selected"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentRight="true"
         android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
         android:clickable="true"
-        android:paddingBottom="20dip"
+        android:focusable="true"
+        android:paddingStart="20dip"
         android:paddingLeft="20dip"
-        android:paddingRight="10dip"
         android:paddingTop="10dip"
+        android:paddingEnd="10dip"
+        android:paddingRight="10dip"
+        android:paddingBottom="20dip"
         android:src="@drawable/__picker_checkbox_bg" />
 
 </com.walkermanx.photopicker.widget.SquareItemLayout>

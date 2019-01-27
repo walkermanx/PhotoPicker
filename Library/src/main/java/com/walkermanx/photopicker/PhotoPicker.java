@@ -4,15 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.support.annotation.ColorInt;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
-import android.support.v4.content.ContextCompat;
-
-import java.util.ArrayList;
 
 import com.walkermanx.photopicker.utils.PermissionsUtils;
+
+import java.util.ArrayList;
 
 import static com.walkermanx.Constants.EXTRA_STATUSBARCOLOR;
 import static com.walkermanx.Constants.EXTRA_TITLE_MARGIN_START;
@@ -37,6 +35,7 @@ public class PhotoPicker {
     public final static int DEFAULT_COLUMN_NUMBER = 3;
 
     public final static String KEY_SELECTED_PHOTOS = "SELECTED_PHOTOS";
+    public final static String KEY_SELECTED_INDEX = "KEY_SELECTED_INDEX";
     public final static String KEY_CAMEAR_PATH = "CAMEAR_PATH";
 
 
