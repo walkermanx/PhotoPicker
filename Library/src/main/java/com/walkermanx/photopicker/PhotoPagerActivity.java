@@ -128,7 +128,7 @@ public class PhotoPagerActivity extends BaseActivity {
                         return;
                     }
 
-                    View itemView = pagerFragment.getViewPager().getChildAt(0);
+                    View itemView = pagerFragment.getShareElement();
 //                        ImageView imageView = itemView.findViewById(R.id.iv_pager);
                     if (itemView == null) {
                         return;

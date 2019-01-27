@@ -151,7 +151,7 @@ public class ImagePagerFragment extends Fragment {
         mViewPager = rootView.findViewById(R.id.vp_photos);
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(currentItem);
-        mViewPager.setOffscreenPageLimit(5);
+        mViewPager.setOffscreenPageLimit(2);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (!transitionFromActivity) {// 判断如果启动SharedElementTransition动画的执行者不是来自 activity  则说明其为fragment 则执行fragment间转场动画准备操作
@@ -251,7 +251,7 @@ public class ImagePagerFragment extends Fragment {
                         // At this stage, the method will simply return the fragment at the position and will
                         // not create a new one.
 //                        View itemView = (View) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
-                        View itemView = mViewPager.getChildAt(0);
+                        View itemView = mViewPager.findViewWithTag(getCurrentItem());
 //                        ImageView imageView = itemView.findViewById(R.id.iv_pager);
                         if (itemView == null) {
                             return;
@@ -380,6 +380,9 @@ public class ImagePagerFragment extends Fragment {
         return mViewPager;
     }
 
+    public View getShareElement() {
+        return mViewPager.findViewWithTag(mViewPager.getCurrentItem());
+    }
 
     public ArrayList<String> getPaths() {
         return paths;
