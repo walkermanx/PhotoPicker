@@ -36,6 +36,12 @@
         android:text="网图预览" />
 
     <Button
+        android:id="@+id/onlinePic"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="加载网络图片" />
+
+    <Button
         android:id="@+id/multiselect"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

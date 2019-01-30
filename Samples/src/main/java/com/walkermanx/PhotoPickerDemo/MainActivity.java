@@ -1,6 +1,7 @@
 package com.walkermanx.PhotoPickerDemo;
 
 import android.content.Intent;
+import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -14,8 +15,11 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.QuickContactBadge;
 
 import com.bumptech.glide.Glide;
 import com.walkermanx.photopicker.PhotoPicker;
@@ -120,6 +124,33 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findViewById(R.id.onlinePic).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                selectedPhotos.clear();
+
+                if (v.isSelected()) {
+                    v.setSelected(false);
+                    ((Button) v).setText("加载网络图片");
+                } else {
+                    v.setSelected(true);
+                    ((Button) v).setText("清空网络图片");
+                    selectedPhotos.add("http://phototask.c360dn.com/Fl-0qph8x14uLb2JwRzko8fOmfqw");
+                    selectedPhotos.add("http://phototask.c360dn.com/FuOUEYx1YLf9gUAykzueD9TzX8Lq");
+                    selectedPhotos.add("http://phototask.c360dn.com/lm7e8LQIsnHteaGlkv6Q6lu05ri8-2018081621-preview.webp");
+                    selectedPhotos.add("http://phototask.c360dn.com/Fo9D8NQqmbs3AAQASxnkPZRHF5Hv");
+                    selectedPhotos.add("http://phototask.c360dn.com/FhGeGKwB9Z6WvuaINQOuc7wm4vvj");
+                    selectedPhotos.add("http://phototask.c360dn.com/Fn8kpRh_rarrSMIoEnnEPadNOuWi");
+                    selectedPhotos.add("http://phototask.c360dn.com/lpNwvBcfABEhJVfEkUvPfPRvA7KF-2018082620-preview.webp");
+                    selectedPhotos.add("http://phototask.c360dn.com/Fn3915H5n7AhYKJdpdlNjSbfPC5e");
+                    selectedPhotos.add("http://phototask.c360dn.com/luqJVmntp51TIcdzGJviz0erj9l9-2018090108-preview.webp");
+                    selectedPhotos.add("http://phototask.c360dn.com/FsOmrix9LiKJXKqi4vOU7fbUmlbQ");
+                }
+
+                photoAdapter.notifyDataSetChanged();
+            }
+        });
+
         findViewById(R.id.multiselect).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -145,24 +176,32 @@ public class MainActivity extends AppCompatActivity {
                                     .setSelected(selectedPhotos)
                                     .start(MainActivity.this);
                         } else {
-                            transitionJump(view.findViewById(R.id.iv_photo), position);
+                            transitionJump((ImageView) view.findViewById(R.id.iv_photo), position);
                         }
                     }
                 }));
     }
 
-    private void transitionJump(View view, int position) {
+    private void transitionJump(ImageView view, int position) {
         this.curPos = position;
+        Log.e("onMapSharedElements", "transitionJump:position= " + position);
+        Log.e("onMapSharedElements", "transitionJump:url= " + selectedPhotos.get(position));
+        Log.e("onMapSharedElements", "transitionJump:TransitionName= " + ViewCompat.getTransitionName(view));
         ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this, view, ViewCompat.getTransitionName(view));
+
         if (sharedElementCallback == null) {
             sharedElementCallback = new SharedElementCallback() {
                 @Override
                 public void onMapSharedElements(List<String> names, Map<String, View> sharedElements) {
-                    RecyclerView.ViewHolder selectedViewHolder = recyclerView.findViewHolderForAdapterPosition(returnPos == -1 ? curPos : returnPos);
+                    int index = returnPos == -1 ? curPos : returnPos;
+                    Log.e("onMapSharedElements", "Exit:index= " + index);
+                    RecyclerView.ViewHolder selectedViewHolder = recyclerView.findViewHolderForAdapterPosition(index);
                     if (selectedViewHolder == null || selectedViewHolder.itemView == null) {
                         return;
                     }
                     returnPos = -1;
+                    Log.e("onMapSharedElements", "Exit:names= " + names.get(0));
+                    Log.e("onMapSharedElements", "Exit:TransitionName= " + ViewCompat.getTransitionName(selectedViewHolder.itemView.findViewById(R.id.iv_photo)));
                     sharedElements.put(names.get(0), selectedViewHolder.itemView.findViewById(R.id.iv_photo));
                 }
             };
@@ -172,6 +211,7 @@ public class MainActivity extends AppCompatActivity {
         PhotoPreview.builder()
                 .setPhotos(selectedPhotos)
                 .setCurrentItem(position)
+                .setPhotoThumbnailForShareElement(view.getDrawable() instanceof BitmapDrawable ? ((BitmapDrawable) view.getDrawable()).getBitmap() : null)
                 //设置主题色系 toolBar背景色 statusBar颜色 以及toolBar 文本/overflow Icon着色
 //              .setThemeColors(R.color.colorPrimary, R.color.colorPrimaryDark, R.color.colorControlNormal)
                 //设置toolBar标题栏于NavigationIcon的边距
@@ -183,9 +223,7 @@ public class MainActivity extends AppCompatActivity {
     public void onActivityReenter(int resultCode, Intent data) {
         super.onActivityReenter(resultCode, data);
         returnPos = data.getIntExtra(PhotoPicker.KEY_SELECTED_INDEX, returnPos);
-        if (returnPos != -1) {
-            supportStartPostponedEnterTransition();
-        }
+        Log.e("onMapSharedElements", "onActivityReenter:returnPos= " + returnPos);
     }
 
     @Override

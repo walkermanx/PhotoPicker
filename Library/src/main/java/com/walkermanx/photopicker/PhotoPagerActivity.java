@@ -6,29 +6,29 @@ import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.SharedElementCallback;
 import android.support.v4.content.ContextCompat;
+import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.transition.Transition;
 import android.transition.TransitionInflater;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
-
 import com.walkermanx.BaseActivity;
 import com.walkermanx.photopicker.fragment.ImagePagerFragment;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-
 import static com.walkermanx.photopicker.PhotoPicker.KEY_SELECTED_INDEX;
 import static com.walkermanx.photopicker.PhotoPicker.KEY_SELECTED_PHOTOS;
 
@@ -59,6 +59,7 @@ public class PhotoPagerActivity extends BaseActivity {
 
         int currentItem = getIntent().getIntExtra(PhotoPreview.EXTRA_CURRENT_ITEM, 0);
         List<String> paths = getIntent().getStringArrayListExtra(PhotoPreview.EXTRA_PHOTOS);
+        Parcelable thumbnail = getIntent().getParcelableExtra(PhotoPreview.EXTRA_PHOTO_THUMBNAIL);
         ArrayList<String> longData = getIntent().getStringArrayListExtra(PhotoPreview.EXTRA_LONG_DATA);
 
         showDelete = getIntent().getBooleanExtra(PhotoPreview.EXTRA_SHOW_DELETE, true);
@@ -69,7 +70,7 @@ public class PhotoPagerActivity extends BaseActivity {
         if (pagerFragment == null) {
             pagerFragment = (ImagePagerFragment) getSupportFragmentManager().findFragmentById(R.id.photoPagerFragment);
         }
-        pagerFragment.setPhotos(paths, currentItem, longData);
+        pagerFragment.setPhotos(paths, currentItem, longData,thumbnail);
 
         mToolbar = findViewById(R.id.toolbar);
         // Set all of the Toolbar coloring
@@ -134,6 +135,8 @@ public class PhotoPagerActivity extends BaseActivity {
                         return;
                     }
 
+                    Log.e("onMapSharedElements", "Enter:names= " + names.get(0));
+                    Log.e("onMapSharedElements", "Enter:TransitionName= " + ViewCompat.getTransitionName(itemView));
                     sharedElements.put(names.get(0), itemView);
                 }
             });

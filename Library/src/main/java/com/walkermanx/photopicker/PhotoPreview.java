@@ -4,14 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.ColorRes;
 import android.support.annotation.DimenRes;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
-
 import java.util.ArrayList;
-
 import static com.walkermanx.Constants.EXTRA_STATUSBARCOLOR;
 import static com.walkermanx.Constants.EXTRA_TITLE_MARGIN_START;
 import static com.walkermanx.Constants.EXTRA_TOOLBARCOLOR;
@@ -28,6 +27,7 @@ public class PhotoPreview {
 
     public final static String EXTRA_CURRENT_ITEM = "current_item";
     public final static String EXTRA_PHOTOS = "photos";
+    public final static String EXTRA_PHOTO_THUMBNAIL = "photos_thumbnail";
     public final static String EXTRA_LONG_DATA = "onLongClickListData";
 
     public final static String EXTRA_SHOW_DELETE = "show_delete";
@@ -115,6 +115,11 @@ public class PhotoPreview {
 
         public PhotoPreviewBuilder setPhotos(ArrayList<String> photoPaths) {
             mPreviewOptionsBundle.putStringArrayList(EXTRA_PHOTOS, photoPaths);
+            return this;
+        }
+
+        public PhotoPreviewBuilder setPhotoThumbnailForShareElement(Parcelable thumbnail) {
+            mPreviewOptionsBundle.putParcelable(EXTRA_PHOTO_THUMBNAIL, thumbnail);
             return this;
         }
 

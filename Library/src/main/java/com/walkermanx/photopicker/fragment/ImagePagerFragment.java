@@ -1,9 +1,13 @@
 package com.walkermanx.photopicker.fragment;
 
+import android.graphics.Bitmap;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
@@ -24,6 +28,7 @@ import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.view.ViewHelper;
 import com.nineoldandroids.view.ViewPropertyAnimator;
 import com.walkermanx.photopicker.R;
+import com.walkermanx.photopicker.event.RequestListener;
 import com.walkermanx.photopicker.adapter.PhotoPagerAdapter;
 
 import java.util.ArrayList;
@@ -37,7 +42,7 @@ import java.util.Map;
 
 // modify ImagePagerFragment.java
 
-public class ImagePagerFragment extends Fragment {
+public class ImagePagerFragment extends Fragment implements RequestListener {
 
     public final static String ARG_PATH = "PATHS";
     public final static String ARG_CURRENT_ITEM = "ARG_CURRENT_ITEM";
@@ -69,7 +74,6 @@ public class ImagePagerFragment extends Fragment {
 
     private int currentItem = 0;
 
-
     private static ImagePagerFragment newInstance(List<String> paths, int currentItem) {
 
         ImagePagerFragment f = new ImagePagerFragment();
@@ -98,11 +102,15 @@ public class ImagePagerFragment extends Fragment {
     }
 
 
-    public void setPhotos(List<String> paths, int currentItem, ArrayList<String> longData) {
+    public void setPhotos(List<String> paths, int currentItem, ArrayList<String> longData, Parcelable thumbnail) {
         this.paths.clear();
         this.paths.addAll(paths);
         this.currentItem = currentItem;
         mPagerAdapter.setLongData(longData);
+        if (thumbnail instanceof Bitmap) {
+            mPagerAdapter.setThumbnail(new BitmapDrawable(getResources(), (Bitmap) thumbnail), currentItem);
+        }
+
         mViewPager.setCurrentItem(currentItem);
         if (mViewPager.getAdapter() != null) {
             mViewPager.getAdapter().notifyDataSetChanged();
@@ -137,7 +145,7 @@ public class ImagePagerFragment extends Fragment {
             transitionFromActivity = bundle.getBoolean(ARG_TRANS_FROM_ACT, transitionFromActivity);
         }
 
-        mPagerAdapter = new PhotoPagerAdapter(this, paths, longData);
+
     }
 
 
@@ -149,9 +157,13 @@ public class ImagePagerFragment extends Fragment {
         View rootView = inflater.inflate(R.layout.__picker_picker_fragment_image_pager, container, false);
 
         mViewPager = rootView.findViewById(R.id.vp_photos);
+        //注意必需使PhotoPagerAdapter和vp缓存视图个数保持一致
+        mViewPager.setOffscreenPageLimit(2);
+        mPagerAdapter = new PhotoPagerAdapter(this, mViewPager.getOffscreenPageLimit(), paths, longData);
+
+
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(currentItem);
-        mViewPager.setOffscreenPageLimit(2);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             if (!transitionFromActivity) {// 判断如果启动SharedElementTransition动画的执行者不是来自 activity  则说明其为fragment 则执行fragment间转场动画准备操作
@@ -212,10 +224,28 @@ public class ImagePagerFragment extends Fragment {
         return rootView;
     }
 
+//    @Override
+//    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+//        super.onViewCreated(view, savedInstanceState);
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+//            getViewPager().postDelayed(new Runnable() {
+//                @Override
+//                public void run() {
+//                    if (transitionFromActivity) {
+//                        if (getActivity() != null)
+//                            getActivity().startPostponedEnterTransition();
+//                    } else {
+//                        startPostponedEnterTransition();
+//                    }
+//                }
+//            }, 100);
+//        }
+//
+//    }
+
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    public void onLoaded(Drawable resource, int position) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && position == currentItem) {
             getViewPager().post(new Runnable() {
                 @Override
                 public void run() {
@@ -228,7 +258,6 @@ public class ImagePagerFragment extends Fragment {
                 }
             });
         }
-
     }
 
     /**
@@ -251,7 +280,8 @@ public class ImagePagerFragment extends Fragment {
                         // At this stage, the method will simply return the fragment at the position and will
                         // not create a new one.
 //                        View itemView = (View) mViewPager.getAdapter().instantiateItem(mViewPager, mViewPager.getCurrentItem());
-                        View itemView = mViewPager.findViewWithTag(getCurrentItem());
+//                        View itemView = mViewPager.findViewWithTag(getCurrentItem());
+                        View itemView = getShareElement();
 //                        ImageView imageView = itemView.findViewById(R.id.iv_pager);
                         if (itemView == null) {
                             return;
@@ -381,7 +411,7 @@ public class ImagePagerFragment extends Fragment {
     }
 
     public View getShareElement() {
-        return mViewPager.findViewWithTag(mViewPager.getCurrentItem());
+        return mPagerAdapter.getItemView(getCurrentItem());
     }
 
     public ArrayList<String> getPaths() {

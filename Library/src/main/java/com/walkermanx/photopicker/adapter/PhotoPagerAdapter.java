@@ -3,8 +3,11 @@ package com.walkermanx.photopicker.adapter;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.graphics.drawable.BitmapDrawable;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.PagerAdapter;
 import android.support.v4.view.ViewCompat;
@@ -16,15 +19,18 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.ListView;
-
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.Priority;
 import com.bumptech.glide.RequestManager;
+import com.bumptech.glide.load.DataSource;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
+import com.bumptech.glide.load.engine.GlideException;
+import com.bumptech.glide.request.RequestListener;
 import com.bumptech.glide.request.RequestOptions;
+import com.bumptech.glide.request.target.Target;
 import com.walkermanx.photopicker.R;
 import com.walkermanx.photopicker.event.PhotoOnLongClickManager;
 import com.walkermanx.photopicker.utils.AndroidLifecycleUtils;
-
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -42,21 +48,57 @@ public class PhotoPagerAdapter extends PagerAdapter {
 
     private RequestManager mGlide;
     private RequestOptions options;
-    private SparseArray<View> pagers = new SparseArray<>();
+    BitmapDrawable thumbnail;
+    int showAtPosition;
+    Fragment fragment;
 
+    protected int VP_CACHE_VIEW_COUNT;  //必需和vp缓存视图个数保持一致
+    protected SparseArray<View> mViewCaches = new SparseArray<>();
 
-    public PhotoPagerAdapter(Fragment fragment, List<String> paths, ArrayList<String> longData) {
+    public PhotoPagerAdapter(Fragment fragment, int viewpagerOffscreenPageLimit, List<String> paths, ArrayList<String> longData) {
+        this.VP_CACHE_VIEW_COUNT = (viewpagerOffscreenPageLimit + 1) * 2;
         this.paths = paths;
+        this.fragment = fragment;
         this.mGlide = Glide.with(fragment);
         this.longData = longData;
         this.options = new RequestOptions()
                 .dontAnimate()
                 .dontTransform()
                 .fitCenter()
-                .override(800, 800)
+//                .transform(new FitCenter())
+                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+//                .override(800, 800)
                 .placeholder(R.drawable.__picker_ic_photo_black_48dp)
                 .error(R.drawable.__picker_ic_broken_image_black_48dp)
                 .priority(Priority.HIGH);
+    }
+
+    public View getItemView(int position) {
+        return mViewCaches.get(position % VP_CACHE_VIEW_COUNT);
+    }
+
+    public void cacheItemView(int position, View view) {
+        mViewCaches.append(position % VP_CACHE_VIEW_COUNT, view);
+    }
+
+    public void setThumbnail(BitmapDrawable thumbnail, int showAtPosition) {
+        this.thumbnail = thumbnail;
+        this.showAtPosition = showAtPosition;
+    }
+
+    private RequestOptions getOpts(boolean showThumbnail) {
+        return showThumbnail ? new RequestOptions()
+                .dontAnimate()
+                .dontTransform()
+                .fitCenter()
+//                .diskCacheStrategy(DiskCacheStrategy.NONE)
+                .skipMemoryCache(true)
+//                .override(800, 800)
+                .placeholder(thumbnail)
+                .error(R.drawable.__picker_ic_broken_image_black_48dp)
+                .priority(Priority.HIGH)
+                : options;
     }
 
     @NonNull
@@ -64,11 +106,13 @@ public class PhotoPagerAdapter extends PagerAdapter {
     public Object instantiateItem(@NonNull ViewGroup container, final int position) {
         final Context context = container.getContext();
 
-        ImageView imageView = (ImageView) pagers.get(position);
+        ImageView imageView = (ImageView) getItemView(position);
+
         if (imageView == null) {
             imageView = (ImageView) LayoutInflater.from(context)
                     .inflate(R.layout.__picker_picker_item_pager, container, false);
-//        final ImageView imageView = itemView.findViewById(R.id.iv_pager);
+//          final ImageView imageView = itemView.findViewById(R.id.iv_pager);
+            cacheItemView(position, imageView);
         }
 
 
@@ -89,12 +133,24 @@ public class PhotoPagerAdapter extends PagerAdapter {
         if (canLoadImage) {
             mGlide.load(uri)
                     .thumbnail(0.1f)
-//                    .dontAnimate()
-//                    .dontTransform()
-//                    .override(800, 800)
-//                    .placeholder(R.drawable.__picker_ic_photo_black_48dp)
-//                    .error(R.drawable.__picker_ic_broken_image_black_48dp)
-                    .apply(options)
+                    .apply(getOpts(thumbnail != null && showAtPosition == position))
+                    .addListener(new RequestListener<Drawable>() {
+                        @Override
+                        public boolean onLoadFailed(@Nullable GlideException e, Object model, Target<Drawable> target, boolean isFirstResource) {
+                            if (fragment instanceof com.walkermanx.photopicker.event.RequestListener){
+                                ((com.walkermanx.photopicker.event.RequestListener) fragment).onLoaded(null,position);
+                            }
+                            return false;
+                        }
+
+                        @Override
+                        public boolean onResourceReady(Drawable resource, Object model, Target<Drawable> target, DataSource dataSource, boolean isFirstResource) {
+                            if (fragment instanceof com.walkermanx.photopicker.event.RequestListener){
+                                ((com.walkermanx.photopicker.event.RequestListener) fragment).onLoaded(resource,position);
+                            }
+                            return false;
+                        }
+                    })
                     .into(imageView);
         }
 
@@ -169,9 +225,7 @@ public class PhotoPagerAdapter extends PagerAdapter {
     public void destroyItem(ViewGroup container, int position, Object object) {
         View v = (View) object;
         container.removeView(v);
-//        Glide.clear((View) object);
         mGlide.clear(v);
-        pagers.append(position, v);
     }
 
     @Override
