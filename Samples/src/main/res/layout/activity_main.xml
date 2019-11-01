@@ -8,6 +8,17 @@
 
     <include layout="@layout/__picker_toolbar"></include>
 
+    <EditText
+        android:id="@+id/etText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:text="Go to"
+        android:id="@+id/goButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
     <Button
         android:id="@+id/button_camera"
         android:layout_width="match_parent"

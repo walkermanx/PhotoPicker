@@ -15,11 +15,14 @@ import android.support.v7.widget.OrientationHelper;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.StaggeredGridLayoutManager;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.QuickContactBadge;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.walkermanx.photopicker.PhotoPicker;
@@ -180,6 +183,24 @@ public class MainActivity extends AppCompatActivity {
                         }
                     }
                 }));
+
+
+        ((EditText) findViewById(R.id.etText)).setText("qsc://app.pedulisehat/do/jump?url=http://www.baidu.com&hide_title=true");
+        findViewById(R.id.goButton).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                CharSequence text = ((EditText) findViewById(R.id.etText)).getText();
+                if (!TextUtils.isEmpty(text)) {
+                    Uri uri = Uri.parse(text.toString());
+                    Intent intent = new Intent(Intent.ACTION_VIEW);
+                    intent.setData(uri);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(v.getContext(), "empty :" + text, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
     }
 
     private void transitionJump(ImageView view, int position) {

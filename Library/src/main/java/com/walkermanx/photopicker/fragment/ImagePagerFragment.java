@@ -47,8 +47,8 @@ public class ImagePagerFragment extends Fragment implements RequestListener {
     public final static String ARG_PATH = "PATHS";
     public final static String ARG_CURRENT_ITEM = "ARG_CURRENT_ITEM";
 
-    private ArrayList<String> paths;
-    private ArrayList<String> longData;
+    private ArrayList<String> paths = new ArrayList<>();
+    private ArrayList<String> longData = new ArrayList<>();
 
     private ViewPager mViewPager;
     private PhotoPagerAdapter mPagerAdapter;
@@ -73,6 +73,7 @@ public class ImagePagerFragment extends Fragment implements RequestListener {
     private final ColorMatrix colorizerMatrix = new ColorMatrix();
 
     private int currentItem = 0;
+    private BitmapDrawable thumbnail;
 
     private static ImagePagerFragment newInstance(List<String> paths, int currentItem) {
 
@@ -91,29 +92,38 @@ public class ImagePagerFragment extends Fragment implements RequestListener {
     public static ImagePagerFragment newInstance(List<String> paths, int currentItem, int[] screenLocation, int thumbnailWidth, int thumbnailHeight) {
 
         ImagePagerFragment f = newInstance(paths, currentItem);
-
-        f.getArguments().putInt(ARG_THUMBNAIL_LEFT, screenLocation[0]);
-        f.getArguments().putInt(ARG_THUMBNAIL_TOP, screenLocation[1]);
-        f.getArguments().putInt(ARG_THUMBNAIL_WIDTH, thumbnailWidth);
-        f.getArguments().putInt(ARG_THUMBNAIL_HEIGHT, thumbnailHeight);
-        f.getArguments().putBoolean(ARG_HAS_ANIM, Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP);
-
+        final Bundle args = f.getArguments();
+        if (args != null) {
+            args.putInt(ARG_THUMBNAIL_LEFT, screenLocation[0]);
+            args.putInt(ARG_THUMBNAIL_TOP, screenLocation[1]);
+            args.putInt(ARG_THUMBNAIL_WIDTH, thumbnailWidth);
+            args.putInt(ARG_THUMBNAIL_HEIGHT, thumbnailHeight);
+            args.putBoolean(ARG_HAS_ANIM, Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP);
+        }
         return f;
     }
 
 
     public void setPhotos(List<String> paths, int currentItem, ArrayList<String> longData, Parcelable thumbnail) {
+        this.longData.clear();
+        this.longData.addAll(longData);
         this.paths.clear();
         this.paths.addAll(paths);
         this.currentItem = currentItem;
-        mPagerAdapter.setLongData(longData);
         if (thumbnail instanceof Bitmap) {
-            mPagerAdapter.setThumbnail(new BitmapDrawable(getResources(), (Bitmap) thumbnail), currentItem);
+            this.thumbnail = new BitmapDrawable(getResources(), (Bitmap) thumbnail);
         }
 
-        mViewPager.setCurrentItem(currentItem);
-        if (mViewPager.getAdapter() != null) {
-            mViewPager.getAdapter().notifyDataSetChanged();
+        if (this.mPagerAdapter != null && this.mViewPager != null) {
+            mPagerAdapter.setLongData(longData);
+            if (this.thumbnail != null) {
+                mPagerAdapter.setThumbnail(this.thumbnail, currentItem);
+            }
+
+            mViewPager.setCurrentItem(currentItem);
+            if (mViewPager.getAdapter() != null) {
+                mViewPager.getAdapter().notifyDataSetChanged();
+            }
         }
     }
 
@@ -125,8 +135,6 @@ public class ImagePagerFragment extends Fragment implements RequestListener {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        paths = new ArrayList<>();
-        longData = new ArrayList<>();
         Bundle bundle = getArguments();
 
         if (bundle != null) {
@@ -160,7 +168,9 @@ public class ImagePagerFragment extends Fragment implements RequestListener {
         //注意必需使PhotoPagerAdapter和vp缓存视图个数保持一致
         mViewPager.setOffscreenPageLimit(2);
         mPagerAdapter = new PhotoPagerAdapter(this, mViewPager.getOffscreenPageLimit(), paths, longData);
-
+        if (this.thumbnail != null) {
+            mPagerAdapter.setThumbnail(this.thumbnail, currentItem);
+        }
 
         mViewPager.setAdapter(mPagerAdapter);
         mViewPager.setCurrentItem(currentItem);

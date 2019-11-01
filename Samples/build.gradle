@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 27
-//    buildToolsVersion "27.0.1"
+    compileSdkVersion 28
+//    buildToolsVersion "28.0.1"
     lintOptions {
         abortOnError false
         checkReleaseBuilds false
@@ -10,7 +10,7 @@ android {
     defaultConfig {
         applicationId "com.walkermanx.PhotoPickerDemo"
         minSdkVersion 14
-        targetSdkVersion 27
+        targetSdkVersion 28
         versionCode 15
         versionName "0.1.1"
     }
@@ -21,8 +21,8 @@ android {
         }
     }
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_7
-        targetCompatibility JavaVersion.VERSION_1_7
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
 }
 

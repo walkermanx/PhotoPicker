@@ -3,6 +3,7 @@ package com.walkermanx.photopicker.utils;
 import android.content.Context;
 import android.database.Cursor;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.Loader;
@@ -30,7 +31,7 @@ public class MediaStoreHelper {
 
 
   public static void getPhotoDirs(FragmentActivity activity, Bundle args, PhotosResultCallback resultCallback) {
-    activity.getSupportLoaderManager()
+    LoaderManager.getInstance(activity)
         .initLoader(0, args, new PhotoDirLoaderCallbacks(activity, resultCallback));
   }
 
@@ -44,6 +45,7 @@ public class MediaStoreHelper {
       this.resultCallback = resultCallback;
     }
 
+    @NonNull
     @Override public Loader<Cursor> onCreateLoader(int id, Bundle args) {
       return new PhotoDirectoryLoader(context, args.getBoolean(PhotoPicker.EXTRA_SHOW_GIF, false));
     }
@@ -90,7 +92,7 @@ public class MediaStoreHelper {
       }
     }
 
-    @Override public void onLoaderReset(Loader<Cursor> loader) {
+    @Override public void onLoaderReset(@NonNull Loader<Cursor> loader) {
 
     }
   }
