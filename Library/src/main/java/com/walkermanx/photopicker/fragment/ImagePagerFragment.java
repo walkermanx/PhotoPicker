@@ -105,10 +105,16 @@ public class ImagePagerFragment extends Fragment implements RequestListener {
 
 
     public void setPhotos(List<String> paths, int currentItem, ArrayList<String> longData, Parcelable thumbnail) {
-        this.longData.clear();
-        this.longData.addAll(longData);
-        this.paths.clear();
-        this.paths.addAll(paths);
+        if (longData != null) {
+            this.longData.clear();
+            this.longData.addAll(longData);
+        }
+
+        if (paths != null) {
+            this.paths.clear();
+            this.paths.addAll(paths);
+        }
+
         this.currentItem = currentItem;
         if (thumbnail instanceof Bitmap) {
             this.thumbnail = new BitmapDrawable(getResources(), (Bitmap) thumbnail);
